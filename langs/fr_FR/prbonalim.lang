@@ -1,0 +1,42 @@
+# Translation file
+
+#
+# Generic
+#
+
+# Module label 'ModulePRBonAlimName'
+ModulePRBonAlimName = PR Bons Alimentaires
+# Module description 'ModulePRBonAlimDesc'
+ModulePRBonAlimDesc = Système de crédit et facturation des bons alimentaires distribués par les partenaires
+
+#
+# Admin page
+#
+PRBonAlimSetup = PRBonAlim setup
+Settings = Settings
+PRBonAlimSetupPage = PRBonAlim setup page
+NewSection=New section
+PRBONALIM_MYPARAM1 = My param 1
+PRBONALIM_MYPARAM1Tooltip = My param 1 tooltip
+PRBONALIM_MYPARAM2=My param 2
+PRBONALIM_MYPARAM2Tooltip=My param 2 tooltip
+
+
+#
+# About page
+#
+About = About
+PRBonAlimAbout = About PRBonAlim
+PRBonAlimAboutPage = PRBonAlim about page
+
+#
+# Sample page
+#
+PRBonAlimArea = Home PRBonAlim
+MyPageName = My page name
+
+#
+# Sample widget
+#
+MyWidget = My widget
+MyWidgetDescription = My widget description
