@@ -319,7 +319,7 @@ class modPRBonAlim extends DolibarrModules
 		$this->menu[$r++] = array(
 			'fk_menu' => '', // Will be stored into mainmenu + leftmenu. Use '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type' => 'top', // This is a Top menu entry
-			'titre' => 'ModulePRBonAlimName',
+			'titre' => 'Bons Alimentaires',
 			'prefix' => img_picto('', $this->picto, 'class="pictofixedwidth valignmiddle"'),
 			'mainmenu' => 'prbonalim',
 			'leftmenu' => '',
@@ -333,55 +333,61 @@ class modPRBonAlim extends DolibarrModules
 		);
 		/* END MODULEBUILDER TOPMENU */
 
-		/* BEGIN MODULEBUILDER LEFTMENU BONALIM */
+
+
+				/* BEGIN MODULEBUILDER LEFTMENU BONS ALIMENTAIRES */
 		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=prbonalim',
 			'type' => 'left',
-			'titre' => 'BonAlim',
-			'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
+			'titre' => 'Bons Alimentaires',
 			'mainmenu' => 'prbonalim',
 			'leftmenu' => 'bonalim',
-			'url' => '/prbonalim/bonalim_list.php',
+			'url' => '/prbonalim/bonalim_index.php',
 			'langs' => 'prbonalim@prbonalim',
-			'position' => 1000 + $r,
-			'enabled' => 'isModEnabled("prbonalim")',
-			'perms' => '$user->hasRight("prbonalim", "bonalim", "read")',
+			'position' => 1000,
+			'enabled' => 'isModEnabled(\'prbonalim\')',
+			'perms' => '$user->hasRight(\'prbonalim\', \'bonalim\', \'read\')',
 			'target' => '',
 			'user' => 2,
-			'object' => 'BonAlim'
+			'object' => '',
 		);
+		/* END MODULEBUILDER LEFTMENU BONS ALIMENTAIRES */
+		/* BEGIN MODULEBUILDER LEFTMENU BONALIM */
 		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=prbonalim,fk_leftmenu=bonalim',
 			'type' => 'left',
-			'titre' => 'List BonAlim',
+			'titre' => 'Lister les Bons',
 			'mainmenu' => 'prbonalim',
 			'leftmenu' => 'prbonalim_bonalim_list',
 			'url' => '/prbonalim/bonalim_list.php',
 			'langs' => 'prbonalim@prbonalim',
-			'position' => 1000 + $r,
-			'enabled' => 'isModEnabled("prbonalim")',
-			'perms' => '$user->hasRight("prbonalim", "bonalim", "read")',
+			'position' => 1000,
+			'enabled' => 'isModEnabled(\'prbonalim\')',
+			'perms' => '$user->hasRight(\'prbonalim\', \'bonalim\', \'read\')',
 			'target' => '',
 			'user' => 2,
-			'object' => 'BonAlim'
+			'object' => 'BonAlim',
 		);
+		/* END MODULEBUILDER LEFTMENU BONALIM */
+		/* BEGIN MODULEBUILDER LEFTMENU BONALIM */
 		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=prbonalim,fk_leftmenu=bonalim',
 			'type' => 'left',
-			'titre' => 'New BonAlim',
+			'titre' => 'Nouveau Bon',
 			'mainmenu' => 'prbonalim',
 			'leftmenu' => 'prbonalim_bonalim_new',
 			'url' => '/prbonalim/bonalim_card.php?action=create',
 			'langs' => 'prbonalim@prbonalim',
-			'position' => 1000 + $r,
-			'enabled' => 'isModEnabled("prbonalim")',
-			'perms' => '$user->hasRight("prbonalim", "bonalim", "write")',
+			'position' => 1000,
+			'enabled' => 'isModEnabled(\'prbonalim\')',
+			'perms' => '$user->hasRight(\'prbonalim\', \'bonalim\', \'write\')',
 			'target' => '',
 			'user' => 2,
-			'object' => 'BonAlim'
+			'object' => 'BonAlim',
 		);
 		/* END MODULEBUILDER LEFTMENU BONALIM */
-		/* BEGIN MODULEBUILDER LEFTMENU MYOBJECT */
+
+		/* BEGIN MODULEBUILDER LEFTMENU BONALIM */
 		/*
 		$this->menu[$r++]=array(
 			'fk_menu' => 'fk_mainmenu=prbonalim',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
@@ -430,12 +436,12 @@ class modPRBonAlim extends DolibarrModules
 			'object' => 'BonAlim'
 		);
 		*/
-		/* END MODULEBUILDER LEFTMENU MYOBJECT */
+		/* END MODULEBUILDER LEFTMENU BONALIM */
 
 
 		// Exports profiles provided by this module
 		$r = 0;
-		/* BEGIN MODULEBUILDER EXPORT MYOBJECT */
+		/* BEGIN MODULEBUILDER EXPORT BONALIM */
 		/*
 		$langs->load("prbonalim@prbonalim");
 		$this->export_code[$r] = $this->rights_class.'_'.$r;
@@ -462,11 +468,11 @@ class modPRBonAlim extends DolibarrModules
 		$this->export_sql_end[$r] .=' WHERE 1 = 1';
 		$this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('bonalim').')';
 		$r++; */
-		/* END MODULEBUILDER EXPORT MYOBJECT */
+		/* END MODULEBUILDER EXPORT BONALIM */
 
 		// Imports profiles provided by this module
 		$r = 0;
-		/* BEGIN MODULEBUILDER IMPORT MYOBJECT */
+		/* BEGIN MODULEBUILDER IMPORT BONALIM */
 		/*
 		$langs->load("prbonalim@prbonalim");
 		$this->import_code[$r] = $this->rights_class.'_'.$r;
@@ -487,8 +493,8 @@ class modPRBonAlim extends DolibarrModules
 		$this->import_convertvalue_array[$r] = array(
 			't.ref' => array(
 				'rule'=>'getrefifauto',
-				'class'=>(!getDolGlobalString('PRBONALIM_MYOBJECT_ADDON') ? 'mod_bonalim_standard' : getDolGlobalString('PRBONALIM_MYOBJECT_ADDON')),
-				'path'=>"/core/modules/prbonalim/".(!getDolGlobalString('PRBONALIM_MYOBJECT_ADDON') ? 'mod_bonalim_standard' : getDolGlobalString('PRBONALIM_MYOBJECT_ADDON')).'.php',
+				'class'=>(!getDolGlobalString('PRBONALIM_BONALIM_ADDON') ? 'mod_bonalim_standard' : getDolGlobalString('PRBONALIM_BONALIM_ADDON')),
+				'path'=>"/core/modules/prbonalim/".(!getDolGlobalString('PRBONALIM_BONALIM_ADDON') ? 'mod_bonalim_standard' : getDolGlobalString('PRBONALIM_BONALIM_ADDON')).'.php',
 				'classobject'=>'BonAlim',
 				'pathobject'=>'/prbonalim/class/bonalim.class.php',
 			),
@@ -498,7 +504,7 @@ class modPRBonAlim extends DolibarrModules
 		);
 		$this->import_run_sql_after_array[$r] = array();
 		$r++; */
-		/* END MODULEBUILDER IMPORT MYOBJECT */
+		/* END MODULEBUILDER IMPORT BONALIM */
 	}
 
 	/**
@@ -538,7 +544,7 @@ class modPRBonAlim extends DolibarrModules
 		// Document templates
 		$moduledir = dol_sanitizeFileName('prbonalim');
 		$myTmpObjects = array();
-		$myTmpObjects['BonAlim'] = array('includerefgeneration' => 0, 'includedocgeneration' => 0);
+		$myTmpObjects['BonAlim'] = array('includerefgeneration' => 1, 'includedocgeneration' => 1);
 
 		foreach ($myTmpObjects as $myTmpObjectKey => $myTmpObjectArray) {
 			if ($myTmpObjectArray['includerefgeneration']) {

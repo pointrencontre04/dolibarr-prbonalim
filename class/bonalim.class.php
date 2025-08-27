@@ -49,7 +49,7 @@ class BonAlim extends CommonObject
 	public $table_element = 'prbonalim_bonalim';
 
 	/**
-	 * @var string 	If permission must be checkec with hasRight('prbonalim', 'read') and not hasright('mymodyle', 'bonalim', 'read'), you can uncomment this line
+	 * @var string 	If permission must be checked with hasRight('prbonalim', 'read') and not hasright('mymodyle', 'bonalim', 'read'), you can uncomment this line
 	 */
 	//public $element_for_permission = 'prbonalim';
 
@@ -133,11 +133,9 @@ class BonAlim extends CommonObject
 	 */
 	public $fields = array(
 		"rowid" => array("type" => "integer", "label" => "TechnicalID", "enabled" => "1", 'position' => 1, 'notnull' => 1, "visible" => "0", "noteditable" => "1", "index" => "1", "css" => "left", "comment" => "Id"),
-		"ref" => array("type" => "varchar(128)", "label" => "Ref", "enabled" => "1", 'position' => 20, 'notnull' => 1, "visible" => "1", "index" => "1", "searchall" => "1", "showoncombobox" => "1", "validate" => "1", "comment" => "Reference of object"),
-		"label" => array("type" => "varchar(255)", "label" => "Label", "enabled" => "1", 'position' => 30, 'notnull' => 0, "visible" => "1", "alwayseditable" => "1", "searchall" => "1", "css" => "minwidth300", "cssview" => "wordbreak", "help" => "Help text", "showoncombobox" => "2", "validate" => "1",),
-		"amount" => array("type" => "price", "label" => "Amount", "enabled" => "1", 'position' => 40, 'notnull' => 0, "visible" => "1", "default" => "null", "isameasure" => "1", "help" => "Help text for amount", "validate" => "1",),
-		"fk_project" => array("type" => "integer:project:projet/class/project.class.php:1", "label" => "Project", "enabled" => "isModEnabled('project')", 'position' => 55, 'notnull' => -1, "visible" => "-1", "index" => "1", "css" => "maxwidth500 widthcentpercentminusxx", "csslist" => "tdoverflowmax150", "validate" => "1",),
-		"description" => array("type" => "text", "label" => "Description", "enabled" => "1", 'position' => 60, 'notnull' => 0, "visible" => "3", "validate" => "1",),
+		"ref" => array("type" => "varchar(128)", "label" => "Ref", "enabled" => "1", 'position' => 20, 'notnull' => 1, "visible" => "1", "noteditable" => "1", "default" => "(PROV)", "index" => "1", "searchall" => "1", "validate" => "1", "comment" => "Reference of object"),
+		"amount" => array("type" => "price", "label" => "Amount", "enabled" => "1", 'position' => 40, 'notnull' => 1, "visible" => "1", "default" => "0", "isameasure" => "1", "validate" => "1",),
+		"fk_project" => array("type" => "integer:Project:projet/class/project.class.php:1", "label" => "Project", "enabled" => "isModEnabled('project')", 'position' => 55, 'notnull' => -1, "visible" => "-1", "index" => "1", "css" => "maxwidth500 widthcentpercentminusxx", "csslist" => "tdoverflowmax150", "validate" => "1",),
 		"note_public" => array("type" => "html", "label" => "NotePublic", "enabled" => "1", 'position' => 61, 'notnull' => 0, "visible" => "0", "cssview" => "wordbreak", "validate" => "1",),
 		"note_private" => array("type" => "html", "label" => "NotePrivate", "enabled" => "1", 'position' => 62, 'notnull' => 0, "visible" => "0", "cssview" => "wordbreak", "validate" => "1",),
 		"date_creation" => array("type" => "datetime", "label" => "DateCreation", "enabled" => "1", 'position' => 500, 'notnull' => 1, "visible" => "-2",),
@@ -148,15 +146,16 @@ class BonAlim extends CommonObject
 		"import_key" => array("type" => "varchar(14)", "label" => "ImportId", "enabled" => "1", 'position' => 1000, 'notnull' => -1, "visible" => "-2",),
 		"model_pdf" => array("type" => "varchar(255)", "label" => "Model pdf", "enabled" => "1", 'position' => 1010, 'notnull' => -1, "visible" => "0",),
 		"status" => array("type" => "integer", "label" => "Status", "enabled" => "1", 'position' => 2000, 'notnull' => 1, "visible" => "1", "index" => "1", "arrayofkeyval" => array("0" => "Brouillon", "1" => "Valid&eacute;", "9" => "Annul&eacute;"), "validate" => "1",),
-		"issuer" => array("type" => "integer:societe:societe/class/societe.class.php:1:((status:=:1) and (entity:in:__shared_entities__))", "label" => "Issuer", "enabled" => "isModEnabled('societe')", 'position' => 51, 'notnull' => -1, "visible" => "1", "index" => "1", "css" => "maxwidth500 widthcentpercentminusxx", "csslist" => "tdoverflowmax150", "help" => "OrganizationEventLinkToThirdParty", "validate" => "1", "comment" => "Link to Issuer third party"),
-		"beneficiary" => array("type" => "integer:societe:societe/class/societe.class.php:1:((status:=:1) and (entity:in:__shared_entities__))", "label" => "Beneficiary", "enabled" => "isModEnabled('societe')", 'position' => 52, 'notnull' => -1, "visible" => "1", "index" => "1", "css" => "maxwidth500 widthcentpercentminusxx", "csslist" => "tdoverflowmax150", "help" => "OrganizationEventLinkToThirdParty", "validate" => "1", "comment" => "Link to Beneficiary third party"),
+		"issuer" => array("type" => "integer:Societe:societe/class/societe.class.php:1:((status:=:1) and (entity:IN:__SHARED_ENTITIES__))", "label" => "Issuer", "enabled" => "isModEnabled('societe')", 'position' => 51, 'notnull' => 1, "visible" => "1", "index" => "1", "css" => "maxwidth500 widthcentpercentminusxx", "csslist" => "tdoverflowmax150", "help" => "WhatIsIssuer", "validate" => "1", "comment" => "Link to Issuer third party"),
+		"beneficiary" => array("type" => "integer:Societe:societe/class/societe.class.php:1:((status:=:1) and (entity:IN:__SHARED_ENTITIES__))", "label" => "Beneficiary", "enabled" => "isModEnabled('societe')", 'position' => 52, 'notnull' => 1, "visible" => "1", "index" => "1", "css" => "maxwidth500 widthcentpercentminusxx", "csslist" => "tdoverflowmax150", "help" => "WhatIsBeneficiary", "validate" => "1", "comment" => "Link to Beneficiary third party"),
+		"date_start" => array("type" => "date", "label" => "DateStart", "enabled" => "1", 'position' => 53, 'notnull' => 1, "visible" => "1",),
+		"date_end" => array("type" => "date", "label" => "DateEnd", "enabled" => "1", 'position' => 54, 'notnull' => 0, "visible" => "1",),
+		"amount_left" => array("type" => "price", "label" => "AmountLeft", "enabled" => "1", 'position' => 41, 'notnull' => 0, "visible" => "5", "noteditable" => "1", "searchall" => "1", "isameasure" => "1",),
 	);
 	public $rowid;
 	public $ref;
-	public $label;
 	public $amount;
 	public $fk_project;
-	public $description;
 	public $note_public;
 	public $note_private;
 	public $date_creation;
@@ -169,6 +168,9 @@ class BonAlim extends CommonObject
 	public $status;
 	public $issuer;
 	public $beneficiary;
+	public $date_start;
+	public $date_end;
+	public $amount_left;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -245,6 +247,8 @@ class BonAlim extends CommonObject
 	 */
 	public function create(User $user, $notrigger = 0)
 	{
+		$this->amount_left = $this->amount;
+
 		$resultcreate = $this->createCommon($user, $notrigger);
 
 		// uncomment lines below if you want to validate object after creation
@@ -459,7 +463,7 @@ class BonAlim extends CommonObject
 	 */
 	public function delete(User $user, $notrigger = 0)
 	{
-		if ($this->status != STATUS_DRAFT) {
+		if (!in_array($this->status, [self::STATUS_DRAFT, self::STATUS_CANCELED])) {
 			$this->error = 'ErrorDeleteLineNotAllowedByObjectStatus';
 			return -2;
 		} else {
@@ -484,7 +488,7 @@ class BonAlim extends CommonObject
 		$error = 0;
 
 		// Protection
-		if ($this->status == self::STATUS_VALIDATED) {
+		if ($this->status == self::STATUS_CREDITED) {
 			dol_syslog(get_class($this)."::validate action abandoned: already validated", LOG_WARNING);
 			return 0;
 		}
@@ -516,7 +520,7 @@ class BonAlim extends CommonObject
 			if (!empty($this->fields['ref'])) {
 				$sql .= " ref = '".$this->db->escape($num)."',";
 			}
-			$sql .= " status = ".self::STATUS_VALIDATED;
+			$sql .= " status = ".self::STATUS_CREDITED;
 			if (!empty($this->fields['date_validation'])) {
 				$sql .= ", date_validation = '".$this->db->idate($now)."'";
 			}
@@ -535,7 +539,7 @@ class BonAlim extends CommonObject
 
 			if (!$error && !$notrigger) {
 				// Call trigger
-				$result = $this->call_trigger('MYOBJECT_VALIDATE', $user);
+				$result = $this->call_trigger('BONALIM_VALIDATE', $user);
 				if ($result < 0) {
 					$error++;
 				}
@@ -591,7 +595,7 @@ class BonAlim extends CommonObject
 		// Set new ref and current status
 		if (!$error) {
 			$this->ref = $num;
-			$this->status = self::STATUS_VALIDATED;
+			$this->status = self::STATUS_CREDITED;
 		}
 
 		if (!$error) {
@@ -613,10 +617,15 @@ class BonAlim extends CommonObject
 	 */
 	public function setDraft($user, $notrigger = 0)
 	{
+
 		// Protection
-		if ($this->status <= self::STATUS_DRAFT) {
+		// TODO: prevent setting Draft if it has payments
+		/*
+		if ($this->status != self::STATUS_CREDITED) {
+			dol_syslog(get_class($this)."::setDraft action abandoned: can only set Draft if no payment is registered", LOG_WARNING);
 			return 0;
 		}
+		*/
 
 		/* if (! ((!getDolGlobalInt('MAIN_USE_ADVANCED_PERMS') && $user->hasRight('prbonalim','write'))
 		 || (getDolGlobalInt('MAIN_USE_ADVANCED_PERMS') && $user->hasRight('prbonalim','prbonalim_advance','validate'))))
@@ -625,7 +634,7 @@ class BonAlim extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'PRBONALIM_MYOBJECT_UNVALIDATE');
+		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'PRBONALIM_BONALIM_UNVALIDATE');
 	}
 
 	/**
@@ -638,7 +647,8 @@ class BonAlim extends CommonObject
 	public function cancel($user, $notrigger = 0)
 	{
 		// Protection
-		if ($this->status != self::STATUS_VALIDATED) {
+		if ($this->status != self::STATUS_CREDITED) {
+			dol_syslog(get_class($this)."::cancel action abandoned: can only cancel if credited", LOG_WARNING);
 			return 0;
 		}
 
@@ -649,7 +659,7 @@ class BonAlim extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'PRBONALIM_MYOBJECT_CANCEL');
+		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'PRBONALIM_BONALIM_CANCEL');
 	}
 
 	/**
@@ -662,7 +672,7 @@ class BonAlim extends CommonObject
 	public function reopen($user, $notrigger = 0)
 	{
 		// Protection
-		if ($this->status == self::STATUS_VALIDATED) {
+		if ($this->status != self::STATUS_CLOSED) {
 			return 0;
 		}
 
@@ -673,7 +683,7 @@ class BonAlim extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'PRBONALIM_MYOBJECT_REOPEN');
+		return $this->setStatusCommon($user, self::STATUS_CREDITED, $notrigger, 'PRBONALIM_BONALIM_REOPEN');
 	}
 
 	/**
@@ -911,19 +921,23 @@ class BonAlim extends CommonObject
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
 			//$langs->load("prbonalim@prbonalim");
-			$this->labelStatus[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
-			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Enabled');
-			$this->labelStatus[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('Disabled');
-			$this->labelStatusShort[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
-			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Enabled');
-			$this->labelStatusShort[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('Disabled');
+			$this->labelStatus[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('BonAlimStatusDraft');
+			$this->labelStatus[self::STATUS_CREDITED] = $langs->transnoentitiesnoconv('BonAlimStatusCredited');
+			$this->labelStatus[self::STATUS_CLOSED] = $langs->transnoentitiesnoconv('BonAlimStatusClosed');
+			$this->labelStatus[self::STATUS_BILLED] = $langs->transnoentitiesnoconv('BonAlimStatusBilled');
+			$this->labelStatus[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('BonAlimStatusCanceled');
+			$this->labelStatusShort[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('BonAlimStatusDraft');
+			$this->labelStatusShort[self::STATUS_CREDITED] = $langs->transnoentitiesnoconv('BonAlimStatusCredited');
+			$this->labelStatusShort[self::STATUS_CLOSED] = $langs->transnoentitiesnoconv('BonAlimStatusClosed');
+			$this->labelStatusShort[self::STATUS_BILLED] = $langs->transnoentitiesnoconv('BonAlimStatusBilled');
+			$this->labelStatusShort[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('BonAlimStatusCanceled');
 		}
 
 		$statusType = 'status'.$status;
-		//if ($status == self::STATUS_VALIDATED) $statusType = 'status1';
-		if ($status == self::STATUS_CANCELED) {
-			$statusType = 'status6';
-		}
+		if ($status == self::STATUS_CREDITED) { $statusType = 'status4'; }
+		if ($status == self::STATUS_CLOSED) { $statusType = 'status3'; }
+		if ($status == self::STATUS_BILLED) { $statusType = 'status5'; }
+		if ($status == self::STATUS_CANCELED) { $statusType = 'status9'; }
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
@@ -990,7 +1004,7 @@ class BonAlim extends CommonObject
 	 */
 	public function initAsSpecimen()
 	{
-		// Set here init that are not commonf fields
+		// Set here init that are not common fields
 		// $this->property1 = ...
 		// $this->property2 = ...
 
@@ -1007,15 +1021,15 @@ class BonAlim extends CommonObject
 		global $langs, $conf;
 		$langs->load("prbonalim@prbonalim");
 
-		if (!getDolGlobalString('PRBONALIM_MYOBJECT_ADDON')) {
-			$conf->global->PRBONALIM_MYOBJECT_ADDON = 'mod_bonalim_standard';
+		if (!getDolGlobalString('PRBONALIM_BONALIM_ADDON')) {
+			$conf->global->PRBONALIM_BONALIM_ADDON = 'mod_bonalim_standard';
 		}
 
-		if (getDolGlobalString('PRBONALIM_MYOBJECT_ADDON')) {
+		if (getDolGlobalString('PRBONALIM_BONALIM_ADDON')) {
 			$mybool = false;
 
-			$file = getDolGlobalString('PRBONALIM_MYOBJECT_ADDON').".php";
-			$classname = getDolGlobalString('PRBONALIM_MYOBJECT_ADDON');
+			$file = getDolGlobalString('PRBONALIM_BONALIM_ADDON').".php";
+			$classname = getDolGlobalString('PRBONALIM_BONALIM_ADDON');
 
 			// Include file with class
 			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
@@ -1069,7 +1083,7 @@ class BonAlim extends CommonObject
 		global $langs;
 
 		$result = 0;
-		$includedocgeneration = 1;
+		$includedocgeneration = 0;
 
 		$langs->load("prbonalim@prbonalim");
 
@@ -1078,8 +1092,8 @@ class BonAlim extends CommonObject
 
 			if (!empty($this->model_pdf)) {
 				$modele = $this->model_pdf;
-			} elseif (getDolGlobalString('MYOBJECT_ADDON_PDF')) {
-				$modele = getDolGlobalString('MYOBJECT_ADDON_PDF');
+			} elseif (getDolGlobalString('BONALIM_ADDON_PDF')) {
+				$modele = getDolGlobalString('BONALIM_ADDON_PDF');
 			}
 		}
 

@@ -41,7 +41,7 @@ class mod_bonalim_standard extends ModeleNumRefBonAlim
 	/**
 	 * @var string
 	 */
-	public $prefix = 'MYOBJECT';
+	public $prefix = 'BON-';
 
 	/**
 	 * @var string Error code (or message)

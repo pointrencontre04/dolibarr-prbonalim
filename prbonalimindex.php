@@ -125,7 +125,7 @@ print load_fiche_titre($langs->trans("PRBonAlimArea"), '', 'prbonalim.png@prbona
 print '<div class="fichecenter"><div class="fichethirdleft">';
 
 
-/* BEGIN MODULEBUILDER DRAFT MYOBJECT
+/* BEGIN MODULEBUILDER DRAFT BONALIM
 // Draft MyObject
 if (isModEnabled('prbonalim') && $user->hasRight('prbonalim', 'read')) {
 	$langs->load("orders");
@@ -194,13 +194,13 @@ if (isModEnabled('prbonalim') && $user->hasRight('prbonalim', 'read')) {
 		dol_print_error($db);
 	}
 }
-END MODULEBUILDER DRAFT MYOBJECT */
+END MODULEBUILDER DRAFT BONALIM */
 
 
 print '</div><div class="fichetwothirdright">';
 
 
-/* BEGIN MODULEBUILDER LASTMODIFIED MYOBJECT
+/* BEGIN MODULEBUILDER LASTMODIFIED BONALIM
 // Last modified myobject
 if (isModEnabled('prbonalim') && $user->hasRight('prbonalim', 'read')) {
 	$sql = "SELECT s.rowid, s.ref, s.label, s.date_creation, s.tms";

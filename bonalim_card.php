@@ -119,7 +119,7 @@ if (!empty($backtopagejsfields)) {
 	$dol_openinpopup = preg_replace('/[^a-z0-9_]/i', '', $tmpbacktopagejsfields[0]);
 }
 
-// Initialize a technical objects
+// Initialize a technical object
 $object = new BonAlim($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->prbonalim->dir_output.'/temp/massgeneration/'.$user->id;
@@ -205,7 +205,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	$triggermodname = 'PRBONALIM_MYOBJECT_MODIFY'; // Name of trigger action code to execute when we modify record
+	$triggermodname = 'PRBONALIM_BONALIM_MODIFY'; // Name of trigger action code to execute when we modify record
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
@@ -230,8 +230,8 @@ if (empty($reshook)) {
 	}
 
 	// Actions to send emails
-	$triggersendname = 'PRBONALIM_MYOBJECT_SENTBYMAIL';
-	$autocopy = 'MAIN_MAIL_AUTOCOPY_MYOBJECT_TO';
+	$triggersendname = 'PRBONALIM_BONALIM_SENTBYMAIL';
+	$autocopy = 'MAIN_MAIL_AUTOCOPY_BONALIM_TO';
 	$trackid = 'bonalim'.$object->id;
 	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
 }
@@ -278,6 +278,8 @@ if ($action == 'create') {
 		accessforbidden('NotEnoughPermissions', 0, 1);
 	}
 
+	$object->fields['status']['visible'] = 0;
+
 	print load_fiche_titre($title, '', $object->picto);
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
@@ -297,7 +299,6 @@ if ($action == 'create') {
 	}
 
 	print dol_get_fiche_head(array(), '');
-
 
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
@@ -360,46 +361,80 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	$formconfirm = '';
 
-	// Confirmation to delete (using preloaded confirm popup)
-	if ($action == 'delete' || ($conf->use_javascript_ajax && empty($conf->dol_use_jmobile))) {
-		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteBonAlim'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 'action-delete');
+	// Confirmation to delete
+	if ($action == 'delete') {
+		$formquestion = [];
+		$formconfirm = $form->formconfirm(
+			$_SERVER["PHP_SELF"].'?id='.$object->id,
+			$langs->trans('DeleteBonAlim'),
+			$langs->trans('ConfirmDeleteBonAlim'),
+			'confirm_delete',
+			$formquestion,
+			'no',
+			0
+		);
 	}
+	/*
 	// Confirmation to delete line
 	if ($action == 'deleteline') {
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id.'&lineid='.$lineid, $langs->trans('DeleteLine'), $langs->trans('ConfirmDeleteLine'), 'confirm_deleteline', '', 0, 1);
 	}
+	*/
 
 	// Clone confirmation
 	if ($action == 'clone') {
-		// Create an array for form
 		$formquestion = array();
-		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmCloneAsk', $object->ref), 'confirm_clone', $formquestion, 'yes', 1);
+		$formconfirm = $form->formconfirm(
+			$_SERVER["PHP_SELF"].'?id='.$object->id,
+			$langs->trans('ToClone'),
+			$langs->trans('ConfirmCloneAsk', $object->ref),
+			'confirm_clone',
+			$formquestion,
+			'yes',
+			0
+		);
 	}
 
-	// Confirmation of action xxxx (You can use it for xxx = 'close', xxx = 'reopen', ...)
-	if ($action == 'xxx') {
-		$text = $langs->trans('ConfirmActionXxx', $object->ref);
-		/*if (isModEnabled('notification'))
-		{
-			require_once DOL_DOCUMENT_ROOT . '/core/class/notify.class.php';
-			$notify = new Notify($db);
-			$text .= '<br>';
-			$text .= $notify->confirmMessage('MYOBJECT_CLOSE', $object->socid, $object);
-		}*/
-
+	// Confirmation of action bonalim_validate
+	if ($action == 'bonalim_validate') {
 		$formquestion = array();
-
-		/*
-		$forcecombo=0;
-		if ($conf->browser->name == 'ie') $forcecombo = 1;	// There is a bug in IE10 that make combo inside popup crazy
-		$formquestion = array(
-			// 'text' => $langs->trans("ConfirmClone"),
-			// array('type' => 'checkbox', 'name' => 'clone_content', 'label' => $langs->trans("CloneMainAttributes"), 'value' => 1),
-			// array('type' => 'checkbox', 'name' => 'update_prices', 'label' => $langs->trans("PuttingPricesUpToDate"), 'value' => 1),
-			// array('type' => 'other',    'name' => 'idwarehouse',   'label' => $langs->trans("SelectWarehouseForStockDecrease"), 'value' => $formproduct->selectWarehouses(GETPOST('idwarehouse')?GETPOST('idwarehouse'):'ifone', 'idwarehouse', '', 1, 0, 0, '', 0, $forcecombo))
+		$formconfirm = $form->formconfirm(
+			$_SERVER["PHP_SELF"].'?id='.$object->id,
+			$langs->trans('ValidateBonAlim'),
+			$langs->trans('ConfirmValidateBonAlim'),
+			'confirm_validate',
+			$formquestion,
+			'yes',
+			0
 		);
-		*/
-		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('XXX'), $text, 'confirm_xxx', $formquestion, 0, 1, 220);
+	}
+
+	// Confirmation of action bonalim_close
+	if ($action == 'bonalim_close') {
+		$formquestion = array();
+		$formconfirm = $form->formconfirm(
+			$_SERVER["PHP_SELF"].'?id='.$object->id,
+			$langs->trans('CloseBonAlim'),
+			$langs->trans('ConfirmCloseBonAlim'),
+			'bonalim_confirm_close',
+			$formquestion,
+			'yes',
+			0
+		);
+	}
+
+	// Confirmation of action bonalim_cancel
+	if ($action == 'bonalim_cancel') {
+		$formquestion = array();
+		$formconfirm = $form->formconfirm(
+			$_SERVER["PHP_SELF"].'?id='.$object->id,
+			$langs->trans('CancelBonAlim'),
+			$langs->trans('ConfirmCancelbonAlim'),
+			'bonalim_confirm_cancel',
+			$formquestion,
+			'yes',
+			0
+		);
 	}
 
 	// Call Hook formConfirm
@@ -484,6 +519,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	 * Lines
 	 */
 
+	/*
 	if (!empty($object->table_element_line)) {
 		// Show object lines
 		$result = $object->getLinesArray();
@@ -532,6 +568,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 		print "</form>\n";
 	}
+	*/
 
 
 	// Buttons for actions
@@ -551,26 +588,60 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			}
 
 			// Back to draft
-			if ($object->status == $object::STATUS_VALIDATED) {
-				print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes&token='.newToken(), '', $permissiontoadd);
+			if ($object->status == $object::STATUS_CREDITED) {
+				print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=setdraft&token='.newToken(), '', $permissiontoadd);
 			}
 
 			// Modify
-			print dolGetButtonAction('', $langs->trans('Modify'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit&token='.newToken(), '', $permissiontoadd);
+			if ($object->status == $object::STATUS_DRAFT) {
+				print dolGetButtonAction('', $langs->trans('Modify'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit&token='.newToken(), '', $permissiontoadd);
+			}
 
 			// Validate
 			if ($object->status == $object::STATUS_DRAFT) {
 				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) > 0)) {
-					print dolGetButtonAction('', $langs->trans('Validate'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=confirm_validate&confirm=yes&token='.newToken(), '', $permissiontoadd);
+					$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_validate&token='.newToken();
+					$buttonId = 'action-validate-no-ajax';
+					$params = array();
+					print dolGetButtonAction('', $langs->trans('Validate'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
 				} else {
 					$langs->load("errors");
 					print dolGetButtonAction($langs->trans("ErrorAddAtLeastOneLineFirst"), $langs->trans("Validate"), 'default', '#', '', 0);
 				}
 			}
 
+			// Cancel
+			if ($object->status == $object::STATUS_CREDITED) { // TODO: check if no payment is present
+				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) > 0)) {
+					$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_cancel&token='.newToken();
+					$buttonId = 'action-cancel-no-ajax';
+					$params = array();
+					print dolGetButtonAction('', $langs->trans('Cancel'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
+				} else {
+					$langs->load("errors");
+					print dolGetButtonAction($langs->trans("ErrorAddAtLeastOneLineFirst"), $langs->trans("Cancel"), 'default', '#', '', 0);
+				}
+			}
+
+			// Close
+			if ($object->status == $object::STATUS_CREDITED) {
+				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) > 0)) {
+					$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_close&token='.newToken();
+					$buttonId = 'action-close-no-ajax';
+					$params = array();
+					print dolGetButtonAction('', $langs->trans('Close'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
+				} else {
+					$langs->load("errors");
+					print dolGetButtonAction($langs->trans("ErrorAddAtLeastOneLineFirst"), $langs->trans("Close"), 'default', '#', '', 0);
+				}
+			}
+
 			// Clone
 			if ($permissiontoadd) {
-				print dolGetButtonAction('', $langs->trans('ToClone'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=clone&token='.newToken(), '', $permissiontoadd);
+				$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=clone&token='.newToken();
+				$buttonId = 'action-clone-no-ajax';
+				$params = array();
+				print dolGetButtonAction('', $langs->trans("ToClone"), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
 			}
 
 			/*
@@ -583,7 +654,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				}
 			}
 			if ($permissiontoadd) {
-				if ($object->status == $object::STATUS_VALIDATED) {
+				if ($object->status == $object::STATUS_CREDITED) {
 					print dolGetButtonAction('', $langs->trans('Cancel'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=close&token='.newToken(), '', $permissiontoadd);
 				} else {
 					print dolGetButtonAction('', $langs->trans('Re-Open'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=reopen&token='.newToken(), '', $permissiontoadd);
@@ -592,14 +663,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			*/
 
 			// Delete (with preloaded confirm popup)
-			$deleteUrl = $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=delete&token='.newToken();
-			$buttonId = 'action-delete-no-ajax';
-			if ($conf->use_javascript_ajax && empty($conf->dol_use_jmobile)) {	// We can use preloaded confirm if not jmobile
-				$deleteUrl = '';
-				$buttonId = 'action-delete';
+			if ($object->status == $object::STATUS_DRAFT || $object->status == $object::STATUS_CANCELED_) {
+				$actionUrl = $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=delete&token='.newToken();
+				$buttonId = 'action-delete-no-ajax';
+				print dolGetButtonAction('', $langs->trans("Delete"), 'delete', $actionUrl, $buttonId, $permissiontodelete, $params);
 			}
-			$params = array();
-			print dolGetButtonAction('', $langs->trans("Delete"), 'delete', $deleteUrl, $buttonId, $permissiontodelete, $params);
 		}
 		print '</div>'."\n";
 	}
@@ -614,7 +682,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print '<div class="fichecenter"><div class="fichehalfleft">';
 		print '<a name="builddoc"></a>'; // ancre
 
-		$includedocgeneration = 1;
+		$includedocgeneration = 0;
 
 		// Documents
 		if ($includedocgeneration) {

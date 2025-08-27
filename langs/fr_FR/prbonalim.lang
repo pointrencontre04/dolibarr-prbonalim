@@ -40,3 +40,25 @@ MyPageName = My page name
 #
 MyWidget = My widget
 MyWidgetDescription = My widget description
+
+Issuer = Prescripteur
+Beneficiary = Bénéficiaire
+WhatIsIssuer = Le prescripteur est l'émetteur du bon (CCAS, assistance sociale, etc).
+WhatIsBeneficiary = Le Bénéficiaire est la famille qui va consommer le bon en épicerie.
+
+AmountLeft = Montant restant
+
+BonAlimStatusDraft = Brouillon
+BonAlimStatusCredited = Crédité
+BonAlimStatusClosed = Clôturé
+BonAlimStatusBilled = Facturé
+BonAlimStatusCanceled = Annulé
+
+DeleteBonAlim = Supprimer le Bon
+ConfirmDeleteBonAlim = Êtes-vous sûr de vouloir supprimer ce Bon ?
+ValidateBonAlim = Valider le Bon
+ConfirmValidateBonAlim = Êtes-vous sûr de vouloir valider ce Bon ?
+CloseBonAlim = Clôturer le Bon
+ConfirmCloseBonAlim = Êtes-vous sûr de vouloir clôturer ce Bon ?
+CancelBonAlim = Annuler le Bon
+ConfirmCancelbonAlim = Êtes-vous sûr de vouloir annuler ce Bon ?

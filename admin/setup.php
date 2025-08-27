@@ -83,7 +83,7 @@ $modulepart = GETPOST('modulepart', 'aZ09');	// Used by actions_setmoduleoptions
 $value = GETPOST('value', 'alpha');
 $label = GETPOST('label', 'alpha');
 $scandir = GETPOST('scan_dir', 'alpha');
-$type = 'myobject';
+$type = 'BonAlim';
 
 $error = 0;
 $setupnotempty = 0;
@@ -196,7 +196,7 @@ $dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
 $moduledir = 'prbonalim';
 $myTmpObjects = array();
 // TODO Scan list of objects to fill this array
-$myTmpObjects['myobject'] = array('label' => 'MyObject', 'includerefgeneration' => 0, 'includedocgeneration' => 0, 'class' => 'MyObject');
+$myTmpObjects['BonAlim'] = array('label' => 'Bon Alimentaire', 'includerefgeneration' => 1, 'includedocgeneration' => 1, 'class' => 'BonAlim');
 
 $tmpobjectkey = GETPOST('object', 'aZ09');
 if ($tmpobjectkey && !array_key_exists($tmpobjectkey, $myTmpObjects)) {
@@ -236,7 +236,7 @@ if ($action == 'updateMask') {
 
 	$className = $myTmpObjects[$tmpobjectkey]['class'];
 	$tmpobject = new $className($db);
-	'@phan-var-force MyObject $tmpobject';
+	'@phan-var-force BonAlim $tmpobject';
 	$tmpobject->initAsSpecimen();
 
 	// Search template files
@@ -255,9 +255,9 @@ if ($action == 'updateMask') {
 		require_once $file;
 
 		$module = new $className($db);
-		'@phan-var-force ModelePDFMyObject $module';
+		'@phan-var-force ModelePDFBonAlim $module';
 
-		'@phan-var-force ModelePDFMyObject $module';
+		'@phan-var-force ModelePDFBonAlim $module';
 
 		if ($module->write_file($tmpobject, $langs) > 0) {
 			header("Location: ".DOL_URL_ROOT."/document.php?modulepart=prbonalim-".strtolower($tmpobjectkey)."&file=SPECIMEN.pdf");
@@ -388,7 +388,7 @@ foreach ($myTmpObjects as $myTmpObjectKey => $myTmpObjectArray) {
 							require_once $dir.'/'.$file.'.php';
 
 							$module = new $file($db);
-							'@phan-var-force ModeleNumRefMyObject $module';
+							'@phan-var-force ModeleNumRefBonAlim $module';
 
 							// Show modules according to features level
 							if ($module->version == 'development' && getDolGlobalInt('MAIN_FEATURES_LEVEL') < 2) {
@@ -431,7 +431,7 @@ foreach ($myTmpObjects as $myTmpObjectKey => $myTmpObjectArray) {
 
 								$className = $myTmpObjectArray['class'];
 								$mytmpinstance = new $className($db);
-								'@phan-var-force MyObject $mytmpinstance';
+								'@phan-var-force BonAlim $mytmpinstance';
 								$mytmpinstance->initAsSpecimen();
 
 								// Info
@@ -529,7 +529,7 @@ foreach ($myTmpObjects as $myTmpObjectKey => $myTmpObjectArray) {
 
 									require_once $dir.'/'.$file;
 									$module = new $className($db);
-									'@phan-var-force ModelePDFMyObject $module';
+									'@phan-var-force ModelePDFBonAlim $module';
 
 									$modulequalified = 1;
 									if ($module->version == 'development' && getDolGlobalInt('MAIN_FEATURES_LEVEL') < 2) {

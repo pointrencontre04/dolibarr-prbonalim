@@ -17,11 +17,9 @@
 CREATE TABLE llx_prbonalim_bonalim(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
-	ref varchar(128) NOT NULL, 
-	label varchar(255), 
-	amount double DEFAULT NULL, 
+	ref varchar(128) DEFAULT '(PROV)' NOT NULL, 
+	amount double NOT NULL, 
 	fk_project integer, 
-	description text, 
 	note_public text, 
 	note_private text, 
 	date_creation datetime NOT NULL, 
@@ -32,7 +30,10 @@ CREATE TABLE llx_prbonalim_bonalim(
 	import_key varchar(14), 
 	model_pdf varchar(255), 
 	status integer NOT NULL, 
-	issuer integer, 
-	beneficiary integer
+	issuer integer NOT NULL, 
+	beneficiary integer NOT NULL, 
+	date_start date NOT NULL, 
+	date_end date, 
+	amount_left double
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;
