@@ -395,6 +395,20 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		);
 	}
 
+	// Confirmation of action setdraft
+	if ($action == 'setdraft') {
+		$formquestion = array();
+		$formconfirm = $form->formconfirm(
+			$_SERVER["PHP_SELF"].'?id='.$object->id,
+			$langs->trans('SetToDraft'),
+			$langs->trans('ConfirmSetToDraft'),
+			'confirm_setdraft',
+			$formquestion,
+			'yes',
+			0
+		);
+	}
+
 	// Confirmation of action bonalim_validate
 	if ($action == 'bonalim_validate') {
 		$formquestion = array();
