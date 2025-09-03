@@ -34,6 +34,10 @@ include_once DOL_DOCUMENT_ROOT.'/core/modules/DolibarrModules.class.php';
  */
 class modPRBonAlim extends DolibarrModules
 {
+
+	const BONALIM_PAYMENT_ID = 501;
+	const BONALIM_PAYMENT_CODE = 'BONALI'; // Limited to 6 chars
+
 	/**
 	 * Constructor. Define names, constants, directories, boxes, permissions
 	 *
@@ -335,7 +339,7 @@ class modPRBonAlim extends DolibarrModules
 
 
 
-				/* BEGIN MODULEBUILDER LEFTMENU BONS ALIMENTAIRES */
+		/* BEGIN MODULEBUILDER LEFTMENU BONS ALIMENTAIRES */
 		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=prbonalim',
 			'type' => 'left',
@@ -526,6 +530,24 @@ class modPRBonAlim extends DolibarrModules
 			return -1; // Do not activate module if error 'not allowed' returned when loading module SQL queries (the _load_table run sql with run_sql with the error allowed parameter set to 'default')
 		}
 
+		// Add payment mode
+		global $db;
+		$sql = "SELECT id FROM " . MAIN_DB_PREFIX . "c_paiement WHERE code = '" . self::BONALIM_PAYMENT_CODE . "'";
+		$resql = $db->query($sql);
+		if ($db->num_rows($resql) == 0) {
+			$sql = "INSERT INTO " . MAIN_DB_PREFIX . "c_paiement (id, entity, code, libelle, type, active) VALUES ('" . self::BONALIM_PAYMENT_ID . "', '1', '" . self::BONALIM_PAYMENT_CODE . "', 'BonAlim', '2', '1')";
+			$result = $db->query($sql);
+			if ($result != true) {
+				return -1;
+			}
+		} else {
+			$sql = "UPDATE " . MAIN_DB_PREFIX . "c_paiement SET active = '1' WHERE code = '" . self::BONALIM_PAYMENT_CODE . "' LIMIT 1";
+			$result = $db->query($sql);
+			if ($result != true) {
+				return -1;
+			}
+		}
+
 		// Create extrafields during init
 		//include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 		//$extrafields = new ExtraFields($this->db);
@@ -537,7 +559,7 @@ class modPRBonAlim extends DolibarrModules
 		//$result5=$extrafields->addExtraField('prbonalim_myattr5', "New Attr 5 label", 'text',    1, 10, 'user',         0, 0, '', '', 1, '', -1, 0, '', '', 'prbonalim@prbonalim', 'isModEnabled("prbonalim")');
 
 		// Permissions
-		$this->remove($options);
+		//$this->remove($options);
 
 		$sql = array();
 
@@ -585,6 +607,36 @@ class modPRBonAlim extends DolibarrModules
 	 */
 	public function remove($options = '')
 	{
+		dol_syslog('Nettoyage du mode de paiement ' . self::BONALIM_PAYMENT_CODE . '', LOG_INFO);
+
+		// Vérifie s'il existe des paiements qui utilisent ce mode
+		global $db;
+		$sql = "SELECT COUNT(*) as nb FROM " . MAIN_DB_PREFIX . "paiement WHERE fk_paiement = '".$db->escape(self::BONALIM_PAYMENT_CODE)."'";
+		$resql = $db->query($sql);
+
+		if ($resql) {
+			$obj = $db->fetch_object($resql);
+			if ($obj->nb == 0) {
+				// Aucun paiement : suppression du mode
+				$sqlDelete = "DELETE FROM " . MAIN_DB_PREFIX . "c_paiement WHERE code = '". self::BONALIM_PAYMENT_CODE ."' LIMIT 1";
+				if ($db->query($sqlDelete)) {
+					dol_syslog('Mode de paiement ' . self::BONALIM_PAYMENT_CODE . ' supprimé avec succès', LOG_INFO);
+				} else {
+					dol_print_error($db);
+				}
+			} else {
+				// Paiements existants : désactivation du mode
+				$sqlDisable = "UPDATE " . MAIN_DB_PREFIX . "c_paiement SET active = '0' WHERE code = '".$db->escape(self::BONALIM_PAYMENT_CODE)."'";
+				if ($db->query($sqlDisable)) {
+					dol_syslog('Mode de paiement ' . self::BONALIM_PAYMENT_CODE . ' désactivé car utilisé dans ' . $obj->nb . ' paiement(s)', LOG_INFO);
+				} else {
+					dol_print_error($db);
+				}
+			}
+		} else {
+			dol_print_error($db);
+		}
+
 		$sql = array();
 		return $this->_remove($sql, $options);
 	}
