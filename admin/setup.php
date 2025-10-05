@@ -110,80 +110,7 @@ if (!$user->admin) {
 
 // Enter here all parameters in your setup page
 
-// Setup conf for selection of an URL
-$item = $formSetup->newItem('PRBONALIM_MYPARAM1');
-$item->fieldAttr['placeholder'] = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $_SERVER['HTTP_HOST'];
-$item->cssClass = 'minwidth500';
 
-// Setup conf for selection of a simple string input
-$item = $formSetup->newItem('PRBONALIM_MYPARAM2');
-$item->defaultFieldValue = 'default value';
-$item->fieldAttr['placeholder'] = 'A placeholder here';
-
-// Setup conf for selection of a simple textarea input but we replace the text of field title
-$item = $formSetup->newItem('PRBONALIM_MYPARAM3');
-$item->nameText = $item->getNameText().' more html text ';
-
-// Setup conf for a selection of a Thirdparty
-$item = $formSetup->newItem('PRBONALIM_MYPARAM4');
-$item->setAsThirdpartyType();
-
-// Setup conf for a selection of a boolean
-$formSetup->newItem('PRBONALIM_MYPARAM5')->setAsYesNo();
-
-// Setup conf for a selection of an Email template of type thirdparty
-$formSetup->newItem('PRBONALIM_MYPARAM6')->setAsEmailTemplate('thirdparty');
-
-// Setup conf for a selection of a secured key
-//$formSetup->newItem('PRBONALIM_MYPARAM7')->setAsSecureKey();
-
-// Setup conf for a selection of a Product
-$formSetup->newItem('PRBONALIM_MYPARAM8')->setAsProduct();
-
-// Add a title for a new section
-$formSetup->newItem('NewSection')->setAsTitle();
-
-$TField = array(
-	'test01' => $langs->trans('test01'),
-	'test02' => $langs->trans('test02'),
-	'test03' => $langs->trans('test03'),
-	'test04' => $langs->trans('test04'),
-	'test05' => $langs->trans('test05'),
-	'test06' => $langs->trans('test06'),
-);
-
-// Setup conf for a simple combo list
-$formSetup->newItem('PRBONALIM_MYPARAM9')->setAsSelect($TField);
-
-// Setup conf for a multiselect combo list
-$item = $formSetup->newItem('PRBONALIM_MYPARAM10');
-$item->setAsMultiSelect($TField);
-$item->helpText = $langs->transnoentities('PRBONALIM_MYPARAM10');
-
-// Setup conf for a category selection
-$formSetup->newItem('PRBONALIM_CATEGORY_ID_XXX')->setAsCategory('product');
-
-// Setup conf PRBONALIM_MYPARAM10
-$item = $formSetup->newItem('PRBONALIM_MYPARAM10');
-$item->setAsColor();
-$item->defaultFieldValue = '#FF0000';
-//$item->fieldValue = '';
-//$item->fieldAttr = array() ; // fields attribute only for compatible fields like input text
-//$item->fieldOverride = false; // set this var to override field output will override $fieldInputOverride and $fieldOutputOverride too
-//$item->fieldInputOverride = false; // set this var to override field input
-//$item->fieldOutputOverride = false; // set this var to override field output
-
-$item = $formSetup->newItem('PRBONALIM_MYPARAM11')->setAsHtml();
-$item->nameText = $item->getNameText().' more html text ';
-$item->fieldInputOverride = '';
-$item->helpText = $langs->transnoentities('HelpMessage');
-$item->cssClass = 'minwidth500';
-
-$item = $formSetup->newItem('PRBONALIM_MYPARAM12');
-$item->fieldOverride = "Value forced, can't be modified";
-$item->cssClass = 'minwidth500';
-
-//$item = $formSetup->newItem('PRBONALIM_MYPARAM13')->setAsDate();	// Not yet implemented
 
 // End of definition of parameters
 
@@ -310,6 +237,28 @@ if ($action == 'updateMask') {
 		$constforval = 'PRBONALIM_'.strtoupper($tmpobjectkey).'_ADDON_PDF';
 		dolibarr_del_const($db, $constforval, $conf->entity);
 	}
+} elseif ($action == 'setParams') {
+	$db->begin();
+
+	// Bank account is not mandatory for BonAlim
+	/*
+	if (GETPOSTISSET('PRBONALIM_BANKACCOUNT_BONALIM')) {
+		$res = dolibarr_set_const($db, "PRBONALIM_BANKACCOUNT_BONALIM", (GETPOST('PRBONALIM_BANKACCOUNT_BONALIM', 'alpha') > 0 ? GETPOST('PRBONALIM_BANKACCOUNT_BONALIM', 'alpha') : ''), 'chaine', 0, '', $conf->entity);
+	}
+	*/
+
+	if (!($res > 0)) {
+		$error++;
+	}
+
+	if (!$error) {
+		$db->commit();
+		setEventMessages($langs->trans("SetupSaved"), null, 'mesgs');
+	} else {
+		$db->rollback();
+		setEventMessages($langs->trans("Error"), null, 'errors');
+	}
+
 }
 
 $action = 'edit';
@@ -353,6 +302,44 @@ if (!empty($formSetup->items)) {
 	print $formSetup->generateOutput(true);
 	print '<br>';
 }
+
+print load_fiche_titre($langs->trans("PRBonAlimSetup", $myTmpObjectArray['label']), '', '');
+
+print '<form action="'.$_SERVER["PHP_SELF"].'" method="post">';
+print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<input type="hidden" name="action" value="setParams">';
+
+print '<div class="div-table-responsive-no-min">';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Parameters").'</td><td></td>';
+print "</tr>\n";
+
+// Bank account is not mandatory for BonAlim
+/*
+$atleastonefound = 0;
+print '<tr class="oddeven"><td>'.$langs->trans("CashDeskBankAccount").'</td>';
+print '<td>';
+print img_picto('', 'bank_account', 'class="pictofixedwidth"');
+print $form->select_comptes(getDolGlobalInt('PRBONALIM_BANKACCOUNT_BONALIM'), 'PRBONALIM_BANKACCOUNT_BONALIM', 0, "courant=2", 1, '', 0, 'maxwidth500 widthcentpercentminusxx', 1);
+print ' <a href="'.DOL_URL_ROOT.'/compta/bank/card.php?action=create&type=2&norappro=1&backtopage='.urlencode($_SERVER["PHP_SELF"]).'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("NewBankAccount").'"></span></a>';
+if (getDolGlobalInt('PRBONALIM_BANKACCOUNT_BONALIM')) {
+	$atleastonefound++;
+}
+print '</td></tr>';
+*/
+
+print '</table>';
+
+if ($atleastonefound == 0 && isModEnabled("bank")) {
+	print info_admin($langs->trans("AtLeastOneDefaultBankAccountMandatory"), 0, 0, 'error');
+}
+
+print $form->buttonsSaveCancel("Save", '');
+
+print '</div>';
+
+print "</form>\n";
 
 
 foreach ($myTmpObjects as $myTmpObjectKey => $myTmpObjectArray) {

@@ -48,6 +48,8 @@ WhatIsBeneficiary = Le Bénéficiaire est la famille qui va consommer le bon en 
 
 AmountLeft = Montant restant
 
+BonAlim = Bon Alimentaire
+
 BonAlimStatusDraft = Brouillon
 BonAlimStatusCredited = Crédité
 BonAlimStatusClosed = Clôturé

@@ -443,6 +443,29 @@ class BonAlim extends CommonObject
 	}
 
 	/**
+	 * Consume an amount on BonAlim
+	 *
+	 * @param	int			$amount		The amount that should be consumed
+	 * @param	User		$user		User that modifies
+	 * @param	int<0,1>	$notrigger	0=launch triggers after, 1=disable triggers
+	 * @return	int<-1,1>				Return integer <0 if KO, >0 if OK
+	 */
+	public function consume($amount, User $user, $notrigger = 0)
+	{
+		if ($amount < 0 || $amount > $this->amount_left) {
+			return -1;
+		}
+
+		$this->amount_left = $this->amount_left - $amount;
+
+		if ($this->amount_left == 0) {
+			$this->status = self::STATUS_CLOSED;
+		}
+
+		return $this->updateCommon($user, $notrigger);
+	}
+
+	/**
 	 * Update object into database
 	 *
 	 * @param	User		$user		User that modifies

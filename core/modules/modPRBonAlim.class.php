@@ -548,6 +548,32 @@ class modPRBonAlim extends DolibarrModules
 			}
 		}
 
+		// Bank account is not mandatory for BonAlim
+		/*
+		// Create cash account BONALIM if not exists
+		if (!getDolGlobalInt('PRBONALIM_BANKACCOUNT_BONALIM')) {
+				require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
+				$cashaccount = new Account($this->db);
+				$searchaccountid = $cashaccount->fetch(0, "BONALIM");
+				if ($searchaccountid == 0) {
+						$cashaccount->ref = "BONALIM";
+						$cashaccount->label = $langs->trans("BONALIM");
+						$cashaccount->courant = Account::TYPE_CASH; // deprecated
+						$cashaccount->type = Account::TYPE_CASH;
+						$cashaccount->country_id = $mysoc->country_id ? $mysoc->country_id : 1;
+						$cashaccount->date_solde = dol_now();
+						$idjournal = dol_getIdFromCode($this->db, 'BQ', 'accounting_journal', 'code', 'rowid');
+						$cashaccount->fk_accountancy_journal = (int) $idjournal;
+						$searchaccountid = $cashaccount->create($user);
+				}
+				if ($searchaccountid > 0) {
+						dolibarr_set_const($this->db, "PRBONALIM_BANKACCOUNT_BONALIM", $searchaccountid, 'chaine', 0, '', $conf->entity);
+				} else {
+						setEventMessages($cashaccount->error, $cashaccount->errors, 'errors');
+				}
+		}
+		*/
+
 		// Create extrafields during init
 		//include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 		//$extrafields = new ExtraFields($this->db);
