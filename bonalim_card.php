@@ -207,6 +207,20 @@ if (empty($reshook)) {
 
 	$triggermodname = 'PRBONALIM_BONALIM_MODIFY'; // Name of trigger action code to execute when we modify record
 
+	// Action bonalim_confirm_close
+	if ($action =='bonalim_confirm_close' && $confirm == 'yes' && !empty($id)) {
+		$object->close($user);
+		$ret = $object->fetch($id); // Reload to get new records
+		$action = '';
+	}
+
+	// Action bonalim_confirm_cancel
+	if ($action =='bonalim_confirm_cancel' && $confirm == 'yes' && !empty($id)) {
+		$object->cancel($user);
+		$ret = $object->fetch($id); // Reload to get new records
+		$action = '';
+	}
+
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 
@@ -625,7 +639,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			}
 
 			// Cancel
-			if ($object->status == $object::STATUS_CREDITED) { // TODO: check if no payment is present
+			if ($object->status == $object::STATUS_CREDITED && $object->amount <= $object->amount_left) {
 				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) > 0)) {
 					$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_cancel&token='.newToken();
 					$buttonId = 'action-cancel-no-ajax';
@@ -638,7 +652,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			}
 
 			// Close
-			if ($object->status == $object::STATUS_CREDITED) {
+			if ($object->status == $object::STATUS_CREDITED && $object->amount > $object->amount_left) {
 				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) > 0)) {
 					$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_close&token='.newToken();
 					$buttonId = 'action-close-no-ajax';

@@ -466,6 +466,24 @@ class BonAlim extends CommonObject
 	}
 
 	/**
+	 * Close a BonAlim
+	 *
+	 * @param	User		$user		User that modifies
+	 * @param	int<0,1>	$notrigger	0=launch triggers after, 1=disable triggers
+	 * @return	int<-1,1>				Return integer <0 if KO, >0 if OK
+	 */
+	public function close(User $user, $notrigger = 0)
+	{
+		// Protection
+		if ($this->status != self::STATUS_CREDITED) {
+			dol_syslog(get_class($this)."::cancel action abandoned: can only close if credited", LOG_WARNING);
+			return 0;
+		}
+
+		return $this->setStatusCommon($user, self::STATUS_CLOSED, $notrigger, 'PRBONALIM_BONALIM_CLOSE');
+	}
+
+	/**
 	 * Update object into database
 	 *
 	 * @param	User		$user		User that modifies
@@ -672,6 +690,10 @@ class BonAlim extends CommonObject
 		// Protection
 		if ($this->status != self::STATUS_CREDITED) {
 			dol_syslog(get_class($this)."::cancel action abandoned: can only cancel if credited", LOG_WARNING);
+			return 0;
+		}
+		if ($this->amount > $this->amount_left) {
+			dol_syslog(get_class($this)."::cancel action abandoned: can only cancel if no payment were made", LOG_WARNING);
 			return 0;
 		}
 
