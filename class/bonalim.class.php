@@ -173,6 +173,15 @@ class BonAlim extends CommonObject
 	public $amount_left;
 	// END MODULEBUILDER PROPERTIES
 
+	// /**
+	//  * @var string    Name of subtable line
+	//  */
+	public $table_element_line = 'prbonalim_bonalim_paiement';
+
+	// /**
+	//  * @var string    Name of subtable class that manage subtable lines
+	//  */
+	public $class_element_line = 'BonAlim_Paiement';
 
 	// /**
 	//  * @var string    Field with ID of parent key if this object has a parent
@@ -191,6 +200,10 @@ class BonAlim extends CommonObject
 	//  */
 	// protected $childtablesoncascade = array('prbonalim_bonalimdet');
 
+	// /**
+	//  * @var BonAlim_Paiement[]     Array of subtable lines
+	//  */
+	public $lines = array();
 
 
 	/**
@@ -362,6 +375,23 @@ class BonAlim extends CommonObject
 	public function fetch($id, $ref = null, $noextrafields = 0, $nolines = 0)
 	{
 		$result = $this->fetchCommon($id, $ref, '', $noextrafields);
+		if ($result > 0 && !empty($this->table_element_line) && empty($nolines)) {
+			$this->fetchLines($noextrafields);
+		}
+		return $result;
+	}
+
+	/**
+	 * Load object lines in memory from the database
+	 *
+	 * @param	int<0,1>	$noextrafields	0=Default to load extrafields, 1=No extrafields
+	 * @return 	int<-1,1>					Return integer <0 if KO, 0 if not found, >0 if OK
+	 */
+	public function fetchLines($noextrafields = 0)
+	{
+		$this->lines = array();
+
+		$result = $this->fetchLinesCommon('', $noextrafields);
 		return $result;
 	}
 
@@ -511,6 +541,24 @@ class BonAlim extends CommonObject
 			return $this->deleteCommon($user, $notrigger);
 		}
 		//return $this->deleteCommon($user, $notrigger, 1);
+	}
+
+	/**
+	 *  Delete a line of object in database
+	 *
+	 *	@param	User		$user		User that delete
+	 *  @param	int			$idline		Id of line to delete
+	 *  @param	int<0,1>	$notrigger	0=launch triggers after, 1=disable triggers
+	 *  @return	int<-2,1>				>0 if OK, <0 if KO
+	 */
+	public function deleteLine(User $user, $idline, $notrigger = 0)
+	{
+		if ($this->status < 0) {
+			$this->error = 'ErrorDeleteLineNotAllowedByObjectStatus';
+			return -2;
+		}
+
+		return $this->deleteLineCommon($user, $idline, $notrigger);
 	}
 
 	/**
@@ -1054,6 +1102,27 @@ class BonAlim extends CommonObject
 		// $this->property2 = ...
 
 		return $this->initAsSpecimenCommon();
+	}
+
+	/**
+	 * 	Create an array of lines
+	 *
+	 * 	@return	BonAlim_Paiement[]|int		array of lines if OK, <0 if KO
+	 */
+	public function getLinesArray()
+	{
+		$this->lines = array();
+
+		$objectline = new BonAlim_Paiement($this->db);
+		$result = $objectline->fetchAll('ASC', 'position', 0, 0, '(fk_bonalim:=:'.((int) $this->id).')');
+
+		if (is_numeric($result)) {
+			$this->setErrorsFromObject($objectline);
+			return $result;
+		} else {
+			$this->lines = $result;
+			return $this->lines;
+		}
 	}
 
 	/**
