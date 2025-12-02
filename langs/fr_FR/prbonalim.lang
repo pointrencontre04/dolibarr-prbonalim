@@ -64,3 +64,11 @@ CloseBonAlim = Clôturer le Bon
 ConfirmCloseBonAlim = Êtes-vous sûr de vouloir clôturer ce Bon ?
 CancelBonAlim = Annuler le Bon
 ConfirmCancelbonAlim = Êtes-vous sûr de vouloir annuler ce Bon ?
+ClassifyBilledBonAlim = Classer Facturé
+ConfirmClassifyBilledBonAlim = Êtes-vous sûr de vouloir classer ce Bon comme facturé ?
+ReOpenBonAlim = Rouvrir
+ConfirmReOpenBonAlim = Êtes-vous sûr de vouloir rouvrir ce Bon ?
+
+ClassifyBilled = Classer Facturé
+
+ErrorHasPayments = Le Bon ne doit pas avoir de paiements pour réaliser cette opération.

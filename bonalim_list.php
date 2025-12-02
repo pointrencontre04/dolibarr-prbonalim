@@ -529,7 +529,10 @@ $param .= $hookmanager->resPrint;
 
 // List of mass actions available
 $arrayofmassactions = array(
-	//'validate'=>img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Validate"),
+	'validate'=>img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Validate"),
+	'close'=>img_picto('', 'fontawesome_archive', 'class="pictofixedwidth"').$langs->trans("Close"),
+	'classifybilled'=>img_picto('', 'fontawesome_file-invoice-dollar', 'class="infobox-commande pictofixedwidth"').$langs->trans("ClassifyBilled"),
+	'reopen'=>img_picto('', 'fontawesome_file-medical', 'class="pictofixedwidth"').$langs->trans("ReOpen"),
 	//'generate_doc'=>img_picto('', 'pdf', 'class="pictofixedwidth"').$langs->trans("ReGeneratePDF"),
 	//'builddoc'=>img_picto('', 'pdf', 'class="pictofixedwidth"').$langs->trans("PDFMerge"),
 	//'presend'=>img_picto('', 'email', 'class="pictofixedwidth"').$langs->trans("SendByMail"),

@@ -87,6 +87,9 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 dol_include_once('/prbonalim/class/bonalim.class.php');
 dol_include_once('/prbonalim/lib/prbonalim_bonalim.lib.php');
 
+dol_include_once('/prbonalim/class/bonalim_paiement.class.php');
+dol_include_once('/prbonalim/lib/prbonalim_bonalim_paiement.lib.php');
+
 /**
  * @var Conf $conf
  * @var DoliDB $db
@@ -217,6 +220,13 @@ if (empty($reshook)) {
 	// Action bonalim_confirm_cancel
 	if ($action =='bonalim_confirm_cancel' && $confirm == 'yes' && !empty($id)) {
 		$object->cancel($user);
+		$ret = $object->fetch($id); // Reload to get new records
+		$action = '';
+	}
+
+	// Action bonalim_confirm_cancel
+	if ($action =='bonalim_confirm_classifybilled' && $confirm == 'yes' && !empty($id)) {
+		$object->setBilled($user);
 		$ret = $object->fetch($id); // Reload to get new records
 		$action = '';
 	}
@@ -465,6 +475,34 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		);
 	}
 
+	// Confirmation of action bonalim_classifybilled
+	if ($action == 'bonalim_classifybilled') {
+		$formquestion = array();
+		$formconfirm = $form->formconfirm(
+			$_SERVER["PHP_SELF"].'?id='.$object->id,
+			$langs->trans('ClassifyBilledBonAlim'),
+			$langs->trans('ConfirmClassifyBilledBonAlim'),
+			'bonalim_confirm_classifybilled',
+			$formquestion,
+			'yes',
+			0
+		);
+	}
+
+	// Confirmation of action bonalim_reopen
+	if ($action == 'bonalim_reopen') {
+		$formquestion = array();
+		$formconfirm = $form->formconfirm(
+			$_SERVER["PHP_SELF"].'?id='.$object->id,
+			$langs->trans('ReOpenBonAlim'),
+			$langs->trans('ConfirmReOpenBonAlim'),
+			'confirm_reopen',
+			$formquestion,
+			'yes',
+			0
+		);
+	}
+
 	// Call Hook formConfirm
 	$parameters = array('formConfirm' => $formconfirm, 'lineid' => $lineid);
 	$reshook = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
@@ -547,11 +585,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	 * Lines
 	 */
 
-	/*
 	if (!empty($object->table_element_line)) {
 		// Show object lines
 		$result = $object->getLinesArray();
 
+		/*
 		print '	<form name="addproduct" id="addproduct" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.(($action != 'editline') ? '' : '#line_'.GETPOSTINT('lineid')).'" method="POST">
 		<input type="hidden" name="token" value="' . newToken().'">
 		<input type="hidden" name="action" value="' . (($action != 'editline') ? 'addline' : 'updateline').'">
@@ -563,6 +601,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		if (!empty($conf->use_javascript_ajax) && $object->status == 0) {
 			include DOL_DOCUMENT_ROOT.'/core/tpl/ajaxrow.tpl.php';
 		}
+		*/
 
 		print '<div class="div-table-responsive-no-min">';
 		if (!empty($object->lines) || ($object->status == $object::STATUS_DRAFT && $permissiontoadd && $action != 'selectlines' && $action != 'editline')) {
@@ -573,6 +612,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			$object->printObjectLines($action, $mysoc, null, GETPOSTINT('lineid'), 1);
 		}
 
+		/*
 		// Form to add new line
 		if ($object->status == 0 && $permissiontoadd && $action != 'selectlines') {
 			if ($action != 'editline') {
@@ -588,6 +628,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				}
 			}
 		}
+		*/
 
 		if (!empty($object->lines) || ($object->status == $object::STATUS_DRAFT && $permissiontoadd && $action != 'selectlines' && $action != 'editline')) {
 			print '</table>';
@@ -596,7 +637,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 		print "</form>\n";
 	}
-	*/
 
 
 	// Buttons for actions
@@ -617,7 +657,14 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 			// Back to draft
 			if ($object->status == $object::STATUS_CREDITED) {
-				print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=setdraft&token='.newToken(), '', $permissiontoadd);
+				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) == 0)) {
+					$actionUrl = $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=setdraft&token='.newToken();
+					$buttonId = '';
+					$params = array();
+					print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
+				} else {
+					print dolGetButtonAction($langs->trans("ErrorHasPayments"), $langs->trans("Cancel"), 'default', '#', '', 0);
+				}
 			}
 
 			// Modify
@@ -627,40 +674,57 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 			// Validate
 			if ($object->status == $object::STATUS_DRAFT) {
-				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) > 0)) {
-					$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_validate&token='.newToken();
-					$buttonId = 'action-validate-no-ajax';
-					$params = array();
-					print dolGetButtonAction('', $langs->trans('Validate'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
-				} else {
-					$langs->load("errors");
-					print dolGetButtonAction($langs->trans("ErrorAddAtLeastOneLineFirst"), $langs->trans("Validate"), 'default', '#', '', 0);
-				}
+				$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_validate&token='.newToken();
+				$buttonId = 'action-validate-no-ajax';
+				$params = array();
+				print dolGetButtonAction('', $langs->trans('Validate'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
 			}
 
 			// Cancel
 			if ($object->status == $object::STATUS_CREDITED && $object->amount <= $object->amount_left) {
-				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) > 0)) {
+				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) == 0)) {
 					$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_cancel&token='.newToken();
 					$buttonId = 'action-cancel-no-ajax';
 					$params = array();
 					print dolGetButtonAction('', $langs->trans('Cancel'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
 				} else {
 					$langs->load("errors");
-					print dolGetButtonAction($langs->trans("ErrorAddAtLeastOneLineFirst"), $langs->trans("Cancel"), 'default', '#', '', 0);
+					print dolGetButtonAction($langs->trans("ErrorHasPayments"), $langs->trans("Cancel"), 'default', '#', '', 0);
 				}
 			}
 
 			// Close
 			if ($object->status == $object::STATUS_CREDITED && $object->amount > $object->amount_left) {
-				if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) > 0)) {
-					$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_close&token='.newToken();
+				$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_close&token='.newToken();
+				$buttonId = 'action-close-no-ajax';
+				$params = array();
+				print dolGetButtonAction('', $langs->trans('Close'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
+			}
+
+			// Classify billed
+			if ($object->status == $object::STATUS_CLOSED) {
+				$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_classifybilled&token='.newToken();
+				$buttonId = 'action-close-no-ajax';
+				$params = array();
+				print dolGetButtonAction('', $langs->trans('ClassifyBilled'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
+			}
+
+			// Reopen
+			if ($object->status == $object::STATUS_BILLED) {
+				$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_reopen&token='.newToken();
+				$buttonId = 'action-close-no-ajax';
+				$params = array();
+				print dolGetButtonAction('', $langs->trans('ReOpen'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
+			}
+			if ($object->status == $object::STATUS_CLOSED || $object->status == $object::STATUS_CANCELED) {
+				if ($object->amount_left > 0) {
+					$actionUrl = $_SERVER['PHP_SELF'].'?id='.$object->id.(!empty($object->socid) ? '&socid='.$object->socid : '').'&action=bonalim_reopen&token='.newToken();
 					$buttonId = 'action-close-no-ajax';
 					$params = array();
-					print dolGetButtonAction('', $langs->trans('Close'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
+					print dolGetButtonAction('', $langs->trans('ReOpen'), 'default', $actionUrl, $buttonId, $permissiontoadd, $params);
 				} else {
 					$langs->load("errors");
-					print dolGetButtonAction($langs->trans("ErrorAddAtLeastOneLineFirst"), $langs->trans("Close"), 'default', '#', '', 0);
+					print dolGetButtonAction($langs->trans("ErrorNoAmountLeft"), $langs->trans("ReOpen"), 'default', '#', '', 0);
 				}
 			}
 

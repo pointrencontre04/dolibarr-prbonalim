@@ -514,6 +514,24 @@ class BonAlim extends CommonObject
 	}
 
 	/**
+	 * Set a BonAlim as billed
+	 *
+	 * @param	User		$user		User that modifies
+	 * @param	int<0,1>	$notrigger	0=launch triggers after, 1=disable triggers
+	 * @return	int<-1,1>				Return integer <0 if KO, >0 if OK
+	 */
+	public function setBilled(User $user, $notrigger = 0)
+	{
+		// Protection
+		if ($this->status != self::STATUS_CLOSED) {
+			dol_syslog(get_class($this)."::setBilled action abandoned: can only setBilled if closed", LOG_WARNING);
+			return 0;
+		}
+
+		return $this->setStatusCommon($user, self::STATUS_BILLED, $notrigger, 'PRBONALIM_BONALIM_SETBILLED');
+	}
+
+	/**
 	 * Update object into database
 	 *
 	 * @param	User		$user		User that modifies
@@ -579,6 +597,12 @@ class BonAlim extends CommonObject
 		// Protection
 		if ($this->status == self::STATUS_CREDITED) {
 			dol_syslog(get_class($this)."::validate action abandoned: already validated", LOG_WARNING);
+			return 0;
+		}
+
+		// Protection
+		if ($this->status != self::STATUS_DRAFT) {
+			dol_syslog(get_class($this)."::validate action abandoned: cannot validate if not draft", LOG_WARNING);
 			return 0;
 		}
 
@@ -765,7 +789,7 @@ class BonAlim extends CommonObject
 	public function reopen($user, $notrigger = 0)
 	{
 		// Protection
-		if ($this->status != self::STATUS_CLOSED) {
+		if ($this->status != self::STATUS_CLOSED && $this->status != self::STATUS_CANCELED && $this->status != self::STATUS_BILLED) {
 			return 0;
 		}
 
@@ -776,7 +800,11 @@ class BonAlim extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_CREDITED, $notrigger, 'PRBONALIM_BONALIM_REOPEN');
+		if ($this->amount_left > 0) {
+			return $this->setStatusCommon($user, self::STATUS_CREDITED, $notrigger, 'PRBONALIM_BONALIM_REOPEN');
+		} else {
+			return $this->setStatusCommon($user, self::STATUS_CLOSED, $notrigger, 'PRBONALIM_BONALIM_REOPEN');
+		}
 	}
 
 	/**
