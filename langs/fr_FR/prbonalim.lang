@@ -71,4 +71,9 @@ ConfirmReOpenBonAlim = Êtes-vous sûr de vouloir rouvrir ce Bon ?
 
 ClassifyBilled = Classer Facturé
 
+CannotValidateBonAlim=Le bon alimentaire %s ne peut pas être validé
+CannotCloseBonAlim=Le bon alimentaire %s ne peut pas être clôturé
+CannotClassifyBilledBonAlim=Le bon alimentaire %s ne peut pas être classé comme facturé
+CannotReopenBonAlim=Le bon alimentaire %s ne peut pas être rouvert
+
 ErrorHasPayments = Le Bon ne doit pas avoir de paiements pour réaliser cette opération.

@@ -280,6 +280,175 @@ if (empty($reshook)) {
 
 	// You can add more action here
 	// if ($action == 'xxx' && $permissiontoxxx) ...
+
+	if (!$error && $massaction == 'bonalimvalidate' && $permissiontoadd) {
+		$objecttmp = new $objectclass($db);
+		$db->begin();
+
+		$nbok = 0;
+		foreach ($toselect as $toselectid) {
+			$result = $objecttmp->fetch($toselectid);
+			if ($result > 0) {
+				if (method_exists($objecttmp, 'validate')) {
+					$result = $objecttmp->validate($user);
+				}
+				if ($result == 0) {
+					$langs->load("errors");
+					setEventMessages($langs->trans("CannotValidateBonAlim", $objecttmp->ref), null, 'errors');
+					$error++;
+					break;
+				} elseif ($result < 0) {
+					setEventMessages($objecttmp->error, $objecttmp->errors, 'errors');
+					$error++;
+					break;
+				} else {
+					$nbok++;
+				}
+			} else {
+				setEventMessages($objecttmp->error, $objecttmp->errors, 'errors');
+				$error++;
+				break;
+			}
+		}
+
+		if (!$error) {
+			if ($nbok > 1) {
+				setEventMessages($langs->trans("RecordsModified", $nbok), null, 'mesgs');
+			} else {
+				setEventMessages($langs->trans("RecordModifiedSuccessfully"), null, 'mesgs');
+			}
+			$db->commit();
+		} else {
+			$db->rollback();
+		}
+	}
+
+	if (!$error && $massaction == 'bonalimclose' && $permissiontoadd) {
+		$objecttmp = new $objectclass($db);
+		$db->begin();
+
+		$nbok = 0;
+		foreach ($toselect as $toselectid) {
+			$result = $objecttmp->fetch($toselectid);
+			if ($result > 0) {
+				if (method_exists($objecttmp, 'close')) {
+					$result = $objecttmp->close($user);
+				}
+				if ($result == 0) {
+					$langs->load("errors");
+					setEventMessages($langs->trans("CannotCloseBonAlim", $objecttmp->ref), null, 'errors');
+					$error++;
+					break;
+				} elseif ($result < 0) {
+					setEventMessages($objecttmp->error, $objecttmp->errors, 'errors');
+					$error++;
+					break;
+				} else {
+					$nbok++;
+				}
+			} else {
+				setEventMessages($objecttmp->error, $objecttmp->errors, 'errors');
+				$error++;
+				break;
+			}
+		}
+
+		if (!$error) {
+			if ($nbok > 1) {
+				setEventMessages($langs->trans("RecordsModified", $nbok), null, 'mesgs');
+			} else {
+				setEventMessages($langs->trans("RecordModifiedSuccessfully"), null, 'mesgs');
+			}
+			$db->commit();
+		} else {
+			$db->rollback();
+		}
+	}
+
+	if (!$error && $massaction == 'bonalimclassifybilled' && $permissiontoadd) {
+		$objecttmp = new $objectclass($db);
+		$db->begin();
+
+		$nbok = 0;
+		foreach ($toselect as $toselectid) {
+			$result = $objecttmp->fetch($toselectid);
+			if ($result > 0) {
+				if (method_exists($objecttmp, 'setBilled')) {
+					$result = $objecttmp->setBilled($user);
+				}
+				if ($result == 0) {
+					$langs->load("errors");
+					setEventMessages($langs->trans("CannotClassifyBilledBonAlim", $objecttmp->ref), null, 'errors');
+					$error++;
+					break;
+				} elseif ($result < 0) {
+					setEventMessages($objecttmp->error, $objecttmp->errors, 'errors');
+					$error++;
+					break;
+				} else {
+					$nbok++;
+				}
+			} else {
+				setEventMessages($objecttmp->error, $objecttmp->errors, 'errors');
+				$error++;
+				break;
+			}
+		}
+
+		if (!$error) {
+			if ($nbok > 1) {
+				setEventMessages($langs->trans("RecordsModified", $nbok), null, 'mesgs');
+			} else {
+				setEventMessages($langs->trans("RecordModifiedSuccessfully"), null, 'mesgs');
+			}
+			$db->commit();
+		} else {
+			$db->rollback();
+		}
+	}
+
+	if (!$error && $massaction == 'bonalimreopen' && $permissiontoadd) {
+		$objecttmp = new $objectclass($db);
+		$db->begin();
+
+		$nbok = 0;
+		foreach ($toselect as $toselectid) {
+			$result = $objecttmp->fetch($toselectid);
+			if ($result > 0) {
+				if (method_exists($objecttmp, 'reopen')) {
+					$result = $objecttmp->reopen($user);
+				}
+				if ($result == 0) {
+					$langs->load("errors");
+					setEventMessages($langs->trans("CannotReopenBonAlim", $objecttmp->ref), null, 'errors');
+					$error++;
+					break;
+				} elseif ($result < 0) {
+					setEventMessages($objecttmp->error, $objecttmp->errors, 'errors');
+					$error++;
+					break;
+				} else {
+					$nbok++;
+				}
+			} else {
+				setEventMessages($objecttmp->error, $objecttmp->errors, 'errors');
+				$error++;
+				break;
+			}
+		}
+
+		if (!$error) {
+			if ($nbok > 1) {
+				setEventMessages($langs->trans("RecordsModified", $nbok), null, 'mesgs');
+			} else {
+				setEventMessages($langs->trans("RecordModifiedSuccessfully"), null, 'mesgs');
+			}
+			$db->commit();
+		} else {
+			$db->rollback();
+		}
+	}
+
 }
 
 
@@ -529,10 +698,10 @@ $param .= $hookmanager->resPrint;
 
 // List of mass actions available
 $arrayofmassactions = array(
-	'validate'=>img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Validate"),
-	'close'=>img_picto('', 'fontawesome_archive', 'class="pictofixedwidth"').$langs->trans("Close"),
-	'classifybilled'=>img_picto('', 'fontawesome_file-invoice-dollar', 'class="infobox-commande pictofixedwidth"').$langs->trans("ClassifyBilled"),
-	'reopen'=>img_picto('', 'fontawesome_file-medical', 'class="pictofixedwidth"').$langs->trans("ReOpen"),
+	'bonalimvalidate'=>img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Validate"),
+	'bonalimclose'=>img_picto('', 'fontawesome_archive', 'class="pictofixedwidth"').$langs->trans("Close"),
+	'bonalimclassifybilled'=>img_picto('', 'fontawesome_file-invoice-dollar', 'class="infobox-commande pictofixedwidth"').$langs->trans("ClassifyBilled"),
+	'bonalimreopen'=>img_picto('', 'fontawesome_file-medical', 'class="pictofixedwidth"').$langs->trans("ReOpen"),
 	//'generate_doc'=>img_picto('', 'pdf', 'class="pictofixedwidth"').$langs->trans("ReGeneratePDF"),
 	//'builddoc'=>img_picto('', 'pdf', 'class="pictofixedwidth"').$langs->trans("PDFMerge"),
 	//'presend'=>img_picto('', 'email', 'class="pictofixedwidth"').$langs->trans("SendByMail"),
