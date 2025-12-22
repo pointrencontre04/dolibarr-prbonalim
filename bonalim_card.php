@@ -755,7 +755,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			*/
 
 			// Delete (with preloaded confirm popup)
-			if ($object->status == $object::STATUS_DRAFT || $object->status == $object::STATUS_CANCELED_) {
+			if ($object->status == $object::STATUS_DRAFT || $object->status == $object::STATUS_CANCELED) {
 				$actionUrl = $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=delete&token='.newToken();
 				$buttonId = 'action-delete-no-ajax';
 				print dolGetButtonAction('', $langs->trans("Delete"), 'delete', $actionUrl, $buttonId, $permissiontodelete, $params);
