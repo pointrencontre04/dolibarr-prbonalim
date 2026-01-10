@@ -64,7 +64,7 @@ class BonAlim extends CommonObject
 	/**
 	 * Canceled status
 	 */
-	const STATUS_CANCELED = -1;
+	const STATUS_CANCELED = 9;
 
 	/**
 	 * Draft status
@@ -148,7 +148,7 @@ class BonAlim extends CommonObject
 		"last_main_doc" => array("type" => "varchar(255)", "label" => "LastMainDoc", "enabled" => "1", 'position' => 600, 'notnull' => 0, "visible" => "0",),
 		"import_key" => array("type" => "varchar(14)", "label" => "ImportId", "enabled" => "1", 'position' => 1000, 'notnull' => -1, "visible" => "-2",),
 		"model_pdf" => array("type" => "varchar(255)", "label" => "Model pdf", "enabled" => "1", 'position' => 1010, 'notnull' => -1, "visible" => "0",),
-		"status" => array("type" => "integer", "label" => "Status", "enabled" => "1", 'position' => 2000, 'notnull' => 1, "visible" => "1", "index" => "1", "arrayofkeyval" => array("0" => "Brouillon", "1" => "Valid&eacute;", "9" => "Annul&eacute;"), "validate" => "1",),
+		"status" => array("type" => "integer", "label" => "Status", "enabled" => "1", 'position' => 2000, 'notnull' => 1, "visible" => "1", "index" => "1", "arrayofkeyval" => array("0" => "Brouillon", "1" => "Cr&eacute;dit&eacute;", "2" => "Cl&ocirc;tur&eacute;", "3" => "Factur&eacute;", "9" => "Annul&eacute;"), "validate" => "1",),
 		"issuer" => array("type" => "integer:Societe:societe/class/societe.class.php:1:((status:=:1) and (t.client:=:0) and (entity:IN:__SHARED_ENTITIES__))", "label" => "Issuer", "enabled" => "isModEnabled('societe')", 'position' => 51, 'notnull' => 1, "visible" => "1", "index" => "1", "css" => "maxwidth500 widthcentpercentminusxx", "csslist" => "tdoverflowmax150", "help" => "WhatIsIssuer", "validate" => "1", "comment" => "Link to Issuer third party"),
 		"beneficiary" => array("type" => "integer:Societe:societe/class/societe.class.php:1:((status:=:1) and (entity:IN:__SHARED_ENTITIES__))", "label" => "Beneficiary", "enabled" => "isModEnabled('societe')", 'position' => 52, 'notnull' => 1, "visible" => "1", "index" => "1", "css" => "maxwidth500 widthcentpercentminusxx", "csslist" => "tdoverflowmax150", "help" => "WhatIsBeneficiary", "validate" => "1", "comment" => "Link to Beneficiary third party"),
 		"date_start" => array("type" => "date", "label" => "DateStart", "enabled" => "1", 'position' => 53, 'notnull' => 1, "visible" => "1",),
