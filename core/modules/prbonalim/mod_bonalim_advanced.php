@@ -50,7 +50,7 @@ class mod_bonalim_advanced extends ModeleNumRefBonAlim
 	/**
 	 * @var string name
 	 */
-	public $name = 'advanced';
+	public $name = 'bon_advanced';
 
 
 	/**

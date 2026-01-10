@@ -218,6 +218,13 @@ class BonAlim_Paiement extends CommonObject
 	 */
 	public function create(User $user, $notrigger = 0)
 	{
+		$this->date_creation = dol_now();
+
+		// Define ref
+		if (empty($this->ref)) {
+			$this->ref = $this->getNextNumRef();
+		}
+
 		$resultcreate = $this->createCommon($user, $notrigger);
 
 		// uncomment lines below if you want to validate object after creation
@@ -873,15 +880,15 @@ class BonAlim_Paiement extends CommonObject
 		global $langs, $conf;
 		$langs->load("prbonalim@prbonalim");
 
-		if (!getDolGlobalString('PRBONALIM_MYOBJECT_ADDON')) {
-			$conf->global->PRBONALIM_MYOBJECT_ADDON = 'mod_bonalim_paiement_standard';
+		if (!getDolGlobalString('PRBONALIM_BONALIM_PAIEMENT_ADDON')) {
+			$conf->global->PRBONALIM_BONALIM_PAIEMENT_ADDON = 'mod_bonalim_paiement_standard';
 		}
 
-		if (getDolGlobalString('PRBONALIM_MYOBJECT_ADDON')) {
+		if (getDolGlobalString('PRBONALIM_BONALIM_PAIEMENT_ADDON')) {
 			$mybool = false;
 
-			$file = getDolGlobalString('PRBONALIM_MYOBJECT_ADDON').".php";
-			$classname = getDolGlobalString('PRBONALIM_MYOBJECT_ADDON');
+			$file = getDolGlobalString('PRBONALIM_BONALIM_PAIEMENT_ADDON').".php";
+			$classname = getDolGlobalString('PRBONALIM_BONALIM_PAIEMENT_ADDON');
 
 			// Include file with class
 			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);

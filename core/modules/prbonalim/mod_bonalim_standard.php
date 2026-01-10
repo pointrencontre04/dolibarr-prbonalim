@@ -51,7 +51,7 @@ class mod_bonalim_standard extends ModeleNumRefBonAlim
 	/**
 	 * @var string name
 	 */
-	public $name = 'standard';
+	public $name = 'bon_standard';
 
 
 	/**

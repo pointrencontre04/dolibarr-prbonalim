@@ -77,3 +77,5 @@ CannotClassifyBilledBonAlim=Le bon alimentaire %s ne peut pas être classé comm
 CannotReopenBonAlim=Le bon alimentaire %s ne peut pas être rouvert
 
 ErrorHasPayments = Le Bon ne doit pas avoir de paiements pour réaliser cette opération.
+
+Invoice = Facture

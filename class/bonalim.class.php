@@ -25,8 +25,11 @@
 
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
+require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+
+require_once DOL_DOCUMENT_ROOT . '/custom/prbonalim/class/bonalim_paiement.class.php';
 
 /**
  * Class for BonAlim
@@ -476,15 +479,32 @@ class BonAlim extends CommonObject
 	 * Consume an amount on BonAlim
 	 *
 	 * @param	int			$amount		The amount that should be consumed
+	 * @param	int			$facid		The invoice on which we want to console the BonAlim
 	 * @param	User		$user		User that modifies
 	 * @param	int<0,1>	$notrigger	0=launch triggers after, 1=disable triggers
 	 * @return	int<-1,1>				Return integer <0 if KO, >0 if OK
 	 */
-	public function consume($amount, User $user, $notrigger = 0)
+	public function consume($amount, $facid, User $user, $notrigger = 0)
 	{
 		if ($amount < 0 || $amount > $this->amount_left) {
 			return -1;
 		}
+
+		// Create the reference between BonAlim and BonAlim_Paiement
+		$line = new BonAlim_Paiement($this->db);
+		//$line->label = 'Payment from invoice ' . $facid;
+		$line->amount = $amount;
+		$line->fk_bonalim = $this->id;
+		$line->fk_invoice = $facid;
+		$result = $line->create($user, $notrigger);
+
+		if ($result < 0) {
+			$this->errors[] = 'Error '.$this->db->lasterror();
+			dol_syslog(__METHOD__.' '.implode(',', $this->errors), LOG_ERR);
+			return -1;
+		}
+
+		$this->lines[] = $line;
 
 		$this->amount_left = $this->amount_left - $amount;
 
@@ -1142,7 +1162,7 @@ class BonAlim extends CommonObject
 		$this->lines = array();
 
 		$objectline = new BonAlim_Paiement($this->db);
-		$result = $objectline->fetchAll('ASC', 'position', 0, 0, '(fk_bonalim:=:'.((int) $this->id).')');
+		$result = $objectline->fetchAll('ASC', 'date_creation', 0, 0, '(fk_bonalim:=:'.((int) $this->id).')');
 
 		if (is_numeric($result)) {
 			$this->setErrorsFromObject($objectline);
@@ -1150,6 +1170,116 @@ class BonAlim extends CommonObject
 		} else {
 			$this->lines = $result;
 			return $this->lines;
+		}
+	}
+
+	/**
+	 *	Return HTML table for object lines
+	 *	TODO Move this into an output class file (htmlline.class.php)
+	 *	If lines are into a template, title must also be into a template
+	 *	But for the moment we don't know if it's possible as we keep a method available on overloaded objects.
+	 *
+	 *	@param	string		$action				Action code
+	 *	@param  Societe		$seller            	Object of seller third party
+	 *	@param  ?Societe  	$buyer             	Object of buyer third party
+	 *	@param	int			$selected		   	ID line selected
+	 *	@param  int	    	$dateSelector      	1=Show also date range input fields
+	 *  @param	string		$defaulttpldir		Directory where to find the template
+	 *	@return	void
+	 */
+	public function printObjectLines($action, $seller, $buyer, $selected = 0, $dateSelector = 0, $defaulttpldir = '/core/tpl')
+	{
+		global $conf, $hookmanager, $langs, $user, $form, $extrafields, $object;
+		// TODO We should not use global var for this
+		global $inputalsopricewithtax, $usemargins, $disableedit, $disablemove, $disableremove, $outputalsopricetotalwithtax;
+
+		// Define $usemargins (used by objectline_xxx.tpl.php files)
+		$usemargins = 0;
+		if (isModEnabled('margin') && !empty($this->element) && in_array($this->element, array('facture', 'facturerec', 'propal', 'commande'))) {
+			$usemargins = 1;
+		}
+
+		$num = count($this->lines);
+
+		// Line extrafield
+		if (!is_object($extrafields)) {
+			require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
+			$extrafields = new ExtraFields($this->db);
+		}
+		$extrafields->fetch_name_optionals_label($this->table_element_line);
+
+		if (method_exists($this, 'loadExpeditions')) {
+			$this->loadExpeditions();
+		}
+
+		$tpl = DOL_DOCUMENT_ROOT.'/custom/prbonalim/core/tpl/bonalim_objectline_title.tpl.php';
+		$res = include $tpl; // for debug
+
+		$i = 0;
+
+		print "<!-- begin printObjectLines() -->\n";
+		foreach ($this->lines as $line) {
+			//Line extrafield
+			$line->fetch_optionals();
+			$this->printObjectLine($action, $line, '', $num, $i, $dateSelector, $seller, $buyer, $selected, $extrafields, $defaulttpldir);
+			$i++;
+		}
+		print "<!-- end printObjectLines() -->\n";
+	}
+
+	/**
+	 *	Return HTML content of a detail line
+	 *	TODO Move this into an output class file (htmlline.class.php)
+	 *
+	 *	@param	string      		$action				GET/POST action
+	 *	@param  CommonObjectLine 	$line			    Selected object line to output
+	 *	@param  ''		    		$var               	Not used
+	 *	@param  int		    		$num               	Number of line (0)
+	 *	@param  int		    		$i					I
+	 *	@param  int		    		$dateSelector      	1=Show also date range input fields
+	 *	@param  Societe	    		$seller            	Object of seller third party
+	 *	@param  Societe	    		$buyer             	Object of buyer third party
+	 *	@param	int					$selected		   	ID line selected
+	 *  @param  ?ExtraFields		$extrafields		Object of extrafields
+	 *  @param	string				$defaulttpldir		Directory where to find the template (deprecated)
+	 *	@return	void
+	 */
+	public function printObjectLine($action, $line, $var, $num, $i, $dateSelector, $seller, $buyer, $selected = 0, $extrafields = null, $defaulttpldir = '/core/tpl')
+	{
+		global $conf, $langs, $user, $object, $hookmanager;
+		global $form;
+		global $disableedit, $disablemove, $disableremove; // TODO We should not use global var for this !
+
+		// var used into tpl
+		$text = '';
+		$description = '';
+		$disableedit = 1;
+
+		// Line in view mode
+		if ($action != 'editline' || $selected != $line->id) {
+			// Invoice
+			if (!empty($line->fk_invoice) && $line->fk_invoice > 0) {
+				$invoice_static = new Facture($this->db);
+				$invoice_static->fetch($line->fk_invoice);
+
+				$invoice_static->ref = $line->ref; //can change ref in hook
+				$invoice_static->label = !empty($line->label) ? $line->label : ""; //can change label in hook
+
+				$text = $invoice_static->getNomUrl(1);
+				$label = $line->ref;
+
+				$text .= ' - '.(!empty($line->label) ? $line->label : $label);
+				$description .= (!empty($line->description) ? dol_htmlentitiesbr($line->description) : ''); // Description is what to show on popup. We shown nothing if already into desc.
+			}
+
+			$line->pu_ttc = price2num((!empty($line->subprice) ? $line->subprice : 0) * (1 + ((!empty($line->tva_tx) ? $line->tva_tx : 0) / 100)), 'MU');
+
+			// Output template part (modules that overwrite templates must declare this into descriptor)
+			// Use global variables + $dateSelector + $seller and $buyer
+			// Note: This is deprecated. If you need to overwrite the tpl file, use instead the hook printObjectLine and printObjectSubLine.
+
+			$tpl = DOL_DOCUMENT_ROOT.'/custom/prbonalim/core/tpl/bonalim_objectline_view.tpl.php';
+			$res = include $tpl; // for debug
 		}
 	}
 

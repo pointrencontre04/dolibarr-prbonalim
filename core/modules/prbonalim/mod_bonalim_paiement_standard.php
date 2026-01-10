@@ -41,7 +41,7 @@ class mod_bonalim_paiement_standard extends ModeleNumRefBonAlim_Paiement
 	/**
 	 * @var string
 	 */
-	public $prefix = 'MYOBJECT';
+	public $prefix = 'BONPAIE-';
 
 	/**
 	 * @var string Error code (or message)
@@ -51,7 +51,7 @@ class mod_bonalim_paiement_standard extends ModeleNumRefBonAlim_Paiement
 	/**
 	 * @var string name
 	 */
-	public $name = 'standard';
+	public $name = 'bon_paiement_standard';
 
 
 	/**
