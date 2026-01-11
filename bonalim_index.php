@@ -63,6 +63,8 @@ if (!$res) {
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
+require_once __DIR__.'/core/boxes/prbonalimwidgetstatistics.php';
+
 /**
  * @var Conf $conf
  * @var DoliDB $db
@@ -86,23 +88,22 @@ if (!empty($user->socid) && $user->socid > 0) {
 	$socid = $user->socid;
 }
 
-// Initialize a technical object to manage hooks. Note that conf->hooks_modules contains array
-//$hookmanager->initHooks(array($object->element.'index'));
-
 // Security check (enable the most restrictive one)
 //if ($user->socid > 0) accessforbidden();
 //if ($user->socid > 0) $socid = $user->socid;
-//if (!isModEnabled('prbonalim')) {
-//	accessforbidden('Module not enabled');
-//}
-//if (! $user->hasRight('prbonalim', 'myobject', 'read')) {
-//	accessforbidden();
-//}
+if (!isModEnabled('prbonalim')) {
+	accessforbidden('Module not enabled');
+}
+if (! $user->hasRight('prbonalim', 'bonalim', 'read')) {
+	accessforbidden();
+}
 //restrictedArea($user, 'prbonalim', 0, 'prbonalim_myobject', 'myobject', '', 'rowid');
 //if (empty($user->admin)) {
 //	accessforbidden('Must be admin');
 //}
 
+// Initialize a technical object to manage hooks. Note that conf->hooks_modules contains array
+//$hookmanager->initHooks(array($object->element.'index'));
 
 /*
  * Actions
@@ -251,6 +252,16 @@ if (isModEnabled('prbonalim') && $user->hasRight('prbonalim', 'read')) {
 	}
 }
 */
+
+print '</div>';
+
+print '<div class="fichecenter">';
+
+if (class_exists('prbonalimwidgetstatistics')) {
+	$box = new prbonalimwidgetstatistics($db);
+	$box->loadBox();
+	$box->showBox();
+}
 
 print '</div></div>';
 

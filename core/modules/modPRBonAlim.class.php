@@ -257,12 +257,11 @@ class modPRBonAlim extends DolibarrModules
 		// Add here list of php file(s) stored in prbonalim/core/boxes that contains a class to show a widget.
 		/* BEGIN MODULEBUILDER WIDGETS */
 		$this->boxes = array(
-			//  0 => array(
-			//      'file' => 'prbonalimwidget1.php@prbonalim',
-			//      'note' => 'Widget provided by PRBonAlim',
-			//      'enabledbydefaulton' => 'Home',
-			//  ),
-			//  ...
+			0 => array(
+			    'file' => 'prbonalimwidgetstatistics.php@prbonalim',
+			    'note' => 'Widget provided by PRBonAlim',
+			    'enabledbydefaulton' => 'prbonalimindex',
+			),
 		);
 		/* END MODULEBUILDER WIDGETS */
 
@@ -327,7 +326,7 @@ class modPRBonAlim extends DolibarrModules
 			'prefix' => img_picto('', $this->picto, 'class="pictofixedwidth valignmiddle"'),
 			'mainmenu' => 'prbonalim',
 			'leftmenu' => '',
-			'url' => '/prbonalim/prbonalimindex.php',
+			'url' => '/prbonalim/bonalim_index.php',
 			'langs' => 'prbonalim@prbonalim', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 1000 + $r,
 			'enabled' => 'isModEnabled("prbonalim")', // Define condition to show or hide menu entry. Use 'isModEnabled("prbonalim")' if entry must be visible if module is enabled.

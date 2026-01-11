@@ -32,8 +32,7 @@ PRBonAlimAboutPage = PRBonAlim about page
 #
 # Sample page
 #
-PRBonAlimArea = Home PRBonAlim
-MyPageName = My page name
+PRBonAlimArea = Tableau de bord Bons Alimentaires
 
 #
 # Sample widget
