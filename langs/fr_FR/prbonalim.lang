@@ -69,6 +69,18 @@ ReOpenBonAlim = Rouvrir
 ConfirmReOpenBonAlim = Êtes-vous sûr de vouloir rouvrir ce Bon ?
 
 ClassifyBilled = Classer Facturé
+CreateInvoice = Créer une facture
+BonAlimFrom = du
+BilledOn = Facturé sur
+
+ErrorBonAlimCreateInvoiceNoInvoices = Aucune facture sélectionnée
+ErrorBonAlimCannotLoad = Impossible de charger le Bon Alimentaire
+ErrorBonAlimCreateInvoiceDifferentIssuer = Les bons alimentaires ont des prescripteurs différents
+ErrorBonAlimNotClosed = Les bons alimentaires ne sont pas tous au statut "Clôturé"
+ErrorBonAlimEmpty = Les bons alimentaires n'ont pas pu être chargés
+ErrorBonAlimInvoiceCannotCreate = Impossible de créer la facture associée aux Bons Alimentaires
+ErrorBonAlimInvoiceCannotAddLine = Impossible d'ajouter une ligne à la facture
+ErrorBonAlimCannotSetBilled = Impossible de marquer le bon alimentaire comme "Facturé"
 
 CannotValidateBonAlim=Le bon alimentaire %s ne peut pas être validé
 CannotCloseBonAlim=Le bon alimentaire %s ne peut pas être clôturé

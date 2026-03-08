@@ -449,6 +449,125 @@ if (empty($reshook)) {
 		}
 	}
 
+	if (!$error && $massaction == 'bonalimcreateinvoice' && $permissiontoadd) {
+		$objecttmp = new $objectclass($db);
+		$db->begin();
+
+		if (empty($toselect) || !is_array($toselect)) {
+			$langs->load("errors");
+			setEventMessages($langs->trans("ErrorBonAlimCreateInvoiceNoInvoices", $objecttmp->ref), null, 'errors');
+			$error++;
+		}
+
+		$issuer_id = 0;
+		$issuer_newid = 0;
+		$bonalims = [];
+		foreach ($toselect as $bonalim_id) {
+			$bonalim = new BonAlim($db);
+			if ($bonalim_id && $bonalim->fetch($bonalim_id) > 0) {
+
+				$bonalims[] = $bonalim;
+				$issuer_newid = $bonalim->issuer;
+
+				// Check that bonalims have the same issuer
+				if ($issuer_id > 0 && $issuer_newid > 0 && $issuer_newid != $issuer_id) {
+					$langs->load("errors");
+					setEventMessages($langs->trans("ErrorBonAlimCreateInvoiceDifferentIssuer", $objecttmp->ref), null, 'errors');
+					$error++;
+				} else {
+					$issuer_id = $issuer_newid;
+				}
+				// Check that all bonalim are closed
+				if (!in_array($bonalim->status, [BonAlim::STATUS_CLOSED])) {
+					$langs->load("errors");
+					setEventMessages($langs->trans("ErrorBonAlimNotClosed", $objecttmp->ref), null, 'errors');
+					$error++;
+				}
+
+			} else {
+				$langs->load("errors");
+				setEventMessages($langs->trans("ErrorBonAlimCannotLoad", $objecttmp->ref), null, 'errors');
+				$error++;
+			}
+		}
+
+		if (empty($bonalims)) {
+			$langs->load("errors");
+			setEventMessages($langs->trans("ErrorBonAlimEmpty", $objecttmp->ref), null, 'errors');
+			$error++;
+		}
+
+		if (!$error) {
+
+			// Create new invoice
+			$newinvoice = new Facture($db);
+			$newinvoice->socid = $bonalims[0]->issuer;
+			$newinvoice->type = Facture::TYPE_STANDARD;
+			$newinvoice->date = dol_now();
+
+			$result = $newinvoice->create($user);
+			if ($result < 0) {
+				$langs->load("errors");
+				setEventMessages($langs->trans("ErrorBonAlimInvoiceCannotCreate", $objecttmp->ref), null, 'errors');
+				$error++;
+			} else {
+
+				// Create new invoice lines
+				foreach ($bonalims as $b) {
+					$label = $langs->trans('BonAlim').' '.$b->ref.' '.$langs->trans('BonAlimFrom').' '.dol_print_date($b->date_start, '%d/%m/%Y');
+
+					$result = $newinvoice->addline(
+						$label,
+						($b->amount - $b->amount_left),
+						1,      // qty
+						0,      // tva
+					);
+
+					if ($result < 0) {
+						$langs->load("errors");
+						setEventMessages($langs->trans("ErrorBonAlimInvoiceCannotAddLine", $objecttmp->ref), null, 'errors');
+						$error++;
+					}
+				}
+
+				if (!$error) {
+
+					// Validate invoice to get Ref
+					$newinvoice->validate($user);
+
+					// Mark all former bonalims as billed
+					foreach ($bonalims as $b) {
+						$b->note_private .= $langs->trans('BilledOn').' '.$newinvoice->ref;
+						$result = $b->update($user);
+
+						if ($result < 0) {
+							$langs->load("errors");
+							setEventMessages($langs->trans("ErrorBonAlimCannotUpdate", $objecttmp->ref), null, 'errors');
+							$error++;
+						}
+
+						$result = $b->setBilled($user);
+
+						if ($result < 0) {
+							$langs->load("errors");
+							setEventMessages($langs->trans("ErrorBonAlimCannotSetBilled", $objecttmp->ref), null, 'errors');
+							$error++;
+						}
+					}
+				}
+			}
+
+		}
+
+		if (!$error) {
+			$db->commit();
+			header('Location: '.DOL_URL_ROOT.'/compta/facture/card.php?facid='.$newinvoice->id);
+		} else {
+			$db->rollback();
+		}
+	}
+
+
 }
 
 
@@ -700,8 +819,9 @@ $param .= $hookmanager->resPrint;
 $arrayofmassactions = array(
 	'bonalimvalidate'=>img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Validate"),
 	'bonalimclose'=>img_picto('', 'fontawesome_archive', 'class="pictofixedwidth"').$langs->trans("Close"),
-	'bonalimclassifybilled'=>img_picto('', 'fontawesome_file-invoice-dollar', 'class="infobox-commande pictofixedwidth"').$langs->trans("ClassifyBilled"),
+	'bonalimclassifybilled'=>img_picto('', 'fontawesome_file-invoice-dollar', 'class="pictofixedwidth"').$langs->trans("ClassifyBilled"),
 	'bonalimreopen'=>img_picto('', 'fontawesome_file-medical', 'class="pictofixedwidth"').$langs->trans("ReOpen"),
+	'bonalimcreateinvoice'=>img_picto('', 'fontawesome_file-invoice-dollar', 'class="infobox-commande pictofixedwidth"').$langs->trans("CreateInvoice"),
 	//'generate_doc'=>img_picto('', 'pdf', 'class="pictofixedwidth"').$langs->trans("ReGeneratePDF"),
 	//'builddoc'=>img_picto('', 'pdf', 'class="pictofixedwidth"').$langs->trans("PDFMerge"),
 	//'presend'=>img_picto('', 'email', 'class="pictofixedwidth"').$langs->trans("SendByMail"),
