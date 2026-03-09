@@ -514,7 +514,10 @@ if (empty($reshook)) {
 
 				// Create new invoice lines
 				foreach ($bonalims as $b) {
-					$label = $langs->trans('BonAlim').' '.$b->ref.' '.$langs->trans('BonAlimFrom').' '.dol_print_date($b->date_start, '%d/%m/%Y');
+					$beneficiary = new Societe($db);
+					$result = $beneficiary->fetch($b->beneficiary);
+					$beneficiary_name = ($result >=0 ? $beneficiary->name : '');
+					$label = $langs->trans('BonAlim').' '.$b->ref.' '.$beneficiary_name.' '.$langs->trans('BonAlimFrom').' '.dol_print_date($b->date_start, '%d/%m/%Y');
 
 					$result = $newinvoice->addline(
 						$label,
