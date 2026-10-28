@@ -237,6 +237,29 @@ class BonAlim extends CommonObject
 			$this->fields['myfield']['noteditable'] = 0;
 		}*/
 
+		// Limit issuers to the third parties of the tag/category defined in module setup.
+		// The USF filter of the field cannot contain a subquery on llx_categorie_societe, so we load
+		// the matching ids here and add them to the filter as (t.rowid:IN:...).
+		// No tag/category defined (or no third party in it) = no restriction.
+		$issuercategory = getDolGlobalInt('PRBONALIM_ISSUER_CATEGORY');
+		if ($issuercategory > 0 && isModEnabled('category') && isset($this->fields['issuer'])) {
+			$issuerids = array();
+			$sql = "SELECT cs.fk_soc FROM ".MAIN_DB_PREFIX."categorie_societe as cs";
+			$sql .= " WHERE cs.fk_categorie = ".((int) $issuercategory);
+			$resql = $this->db->query($sql);
+			if ($resql) {
+				while ($obj = $this->db->fetch_object($resql)) {
+					$issuerids[] = (int) $obj->fk_soc;
+				}
+				$this->db->free($resql);
+			} else {
+				dol_syslog(__METHOD__." ".$this->db->lasterror(), LOG_ERR);
+			}
+			if (!empty($issuerids)) {
+				$this->fields['issuer']['type'] .= " AND (t.rowid:IN:".implode(',', $issuerids).")";
+			}
+		}
+
 		// Unset fields that are disabled
 		foreach ($this->fields as $key => $val) {
 			if (isset($val['enabled']) && empty($val['enabled'])) {

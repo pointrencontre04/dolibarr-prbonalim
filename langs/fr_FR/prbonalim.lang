@@ -35,6 +35,15 @@ PRBonAlimAboutPage = PRBonAlim about page
 PRBonAlimArea = Tableau de bord Bons Alimentaires
 
 #
+# Help page
+#
+PRBonAlimHelp = Aide
+PRBonAlimHelpIssuer = Ajouter un prescripteur
+PRBonAlimHelpBonAlim = Créer et créditer un bon
+PRBonAlimHelpInvoice = Facturer les bons
+PRBonAlimHelpNotFound = Aucune page d'aide disponible.
+
+#
 # Sample widget
 #
 MyWidget = My widget
@@ -46,6 +55,9 @@ WhatIsIssuer = Le prescripteur est l'émetteur du bon (CCAS, assistance sociale,
 WhatIsBeneficiary = Le Bénéficiaire est la famille qui va consommer le bon en épicerie.
 RefIssuer = Réf. prescripteur
 WhatIsRefIssuer = Référence interne du bon chez le prescripteur.
+IssuerCategory = Tag/catégorie prescripteurs
+IssuerCategoryHelp = Seuls les tiers ayant ce tag/catégorie seront proposés lors de la sélection du prescripteur. Si vide, tous les tiers sont proposés.
+IssuerCategoryModuleDisabled = Le module Tags/Catégories doit être activé pour utiliser ce paramètre.
 
 AmountLeft = Montant restant
 

@@ -58,6 +58,7 @@ if (!$res) {
 // Libraries
 require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
 require_once '../lib/prbonalim.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 //require_once "../class/myclass.class.php";
 
 /**
@@ -240,6 +241,16 @@ if ($action == 'updateMask') {
 } elseif ($action == 'setParams') {
 	$db->begin();
 
+	$res = 1;
+
+	if (GETPOSTISSET('PRBONALIM_ISSUER_CATEGORY')) {
+		if (GETPOSTINT('PRBONALIM_ISSUER_CATEGORY') > 0) {
+			$res = dolibarr_set_const($db, "PRBONALIM_ISSUER_CATEGORY", (string) GETPOSTINT('PRBONALIM_ISSUER_CATEGORY'), 'chaine', 0, '', $conf->entity);
+		} else {
+			$res = dolibarr_del_const($db, "PRBONALIM_ISSUER_CATEGORY", $conf->entity);
+		}
+	}
+
 	// Bank account is not mandatory for BonAlim
 	/*
 	if (GETPOSTISSET('PRBONALIM_BANKACCOUNT_BONALIM')) {
@@ -314,6 +325,18 @@ print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
 print '<td>'.$langs->trans("Parameters").'</td><td></td>';
 print "</tr>\n";
+
+// Tag/category of third parties allowed as issuer
+print '<tr class="oddeven"><td>'.$form->textwithpicto($langs->trans("IssuerCategory"), $langs->trans("IssuerCategoryHelp")).'</td>';
+print '<td>';
+if (isModEnabled('category')) {
+	print img_picto('', 'category', 'class="pictofixedwidth"');
+	print $form->select_all_categories(Categorie::TYPE_CUSTOMER, getDolGlobalString('PRBONALIM_ISSUER_CATEGORY'), 'PRBONALIM_ISSUER_CATEGORY', 64, 0, 0, 0, 'maxwidth500 widthcentpercentminusxx', 1);
+	print ajax_combobox('PRBONALIM_ISSUER_CATEGORY');
+} else {
+	print '<span class="opacitymedium">'.$langs->trans("IssuerCategoryModuleDisabled").'</span>';
+}
+print '</td></tr>';
 
 // Bank account is not mandatory for BonAlim
 /*

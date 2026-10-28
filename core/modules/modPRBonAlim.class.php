@@ -389,6 +389,66 @@ class modPRBonAlim extends DolibarrModules
 			'object' => 'BonAlim',
 		);
 		/* END MODULEBUILDER LEFTMENU BONALIM */
+		$this->menu[$r++] = array(
+			'fk_menu' => 'fk_mainmenu=prbonalim',
+			'type' => 'left',
+			'titre' => 'PRBonAlimHelp',
+			'mainmenu' => 'prbonalim',
+			'leftmenu' => 'prbonalim_help',
+			'url' => '/prbonalim/bonalim_help.php?page=issuer',
+			'langs' => 'prbonalim@prbonalim',
+			'position' => 1100,
+			'enabled' => 'isModEnabled(\'prbonalim\')',
+			'perms' => '$user->hasRight(\'prbonalim\', \'bonalim\', \'read\')',
+			'target' => '',
+			'user' => 2,
+			'object' => '',
+		);
+		$this->menu[$r++] = array(
+			'fk_menu' => 'fk_mainmenu=prbonalim,fk_leftmenu=prbonalim_help',
+			'type' => 'left',
+			'titre' => 'PRBonAlimHelpIssuer',
+			'mainmenu' => 'prbonalim',
+			'leftmenu' => 'prbonalim_help_issuer',
+			'url' => '/prbonalim/bonalim_help.php?page=issuer',
+			'langs' => 'prbonalim@prbonalim',
+			'position' => 1101,
+			'enabled' => 'isModEnabled(\'prbonalim\')',
+			'perms' => '$user->hasRight(\'prbonalim\', \'bonalim\', \'read\')',
+			'target' => '',
+			'user' => 2,
+			'object' => '',
+		);
+		$this->menu[$r++] = array(
+			'fk_menu' => 'fk_mainmenu=prbonalim,fk_leftmenu=prbonalim_help',
+			'type' => 'left',
+			'titre' => 'PRBonAlimHelpBonAlim',
+			'mainmenu' => 'prbonalim',
+			'leftmenu' => 'prbonalim_help_bonalim',
+			'url' => '/prbonalim/bonalim_help.php?page=bonalim',
+			'langs' => 'prbonalim@prbonalim',
+			'position' => 1102,
+			'enabled' => 'isModEnabled(\'prbonalim\')',
+			'perms' => '$user->hasRight(\'prbonalim\', \'bonalim\', \'read\')',
+			'target' => '',
+			'user' => 2,
+			'object' => '',
+		);
+		$this->menu[$r++] = array(
+			'fk_menu' => 'fk_mainmenu=prbonalim,fk_leftmenu=prbonalim_help',
+			'type' => 'left',
+			'titre' => 'PRBonAlimHelpInvoice',
+			'mainmenu' => 'prbonalim',
+			'leftmenu' => 'prbonalim_help_invoice',
+			'url' => '/prbonalim/bonalim_help.php?page=invoice',
+			'langs' => 'prbonalim@prbonalim',
+			'position' => 1103,
+			'enabled' => 'isModEnabled(\'prbonalim\')',
+			'perms' => '$user->hasRight(\'prbonalim\', \'bonalim\', \'read\')',
+			'target' => '',
+			'user' => 2,
+			'object' => '',
+		);
 
 		/* BEGIN MODULEBUILDER LEFTMENU BONALIM */
 		/*
