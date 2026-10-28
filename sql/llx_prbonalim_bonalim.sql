@@ -34,6 +34,7 @@ CREATE TABLE llx_prbonalim_bonalim(
 	beneficiary integer NOT NULL, 
 	date_start date NOT NULL, 
 	date_end date, 
-	amount_left double
+	amount_left double,
+	ref_issuer varchar(128)
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

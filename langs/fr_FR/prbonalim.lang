@@ -44,6 +44,8 @@ Issuer = Prescripteur
 Beneficiary = Bénéficiaire
 WhatIsIssuer = Le prescripteur est l'émetteur du bon (CCAS, assistance sociale, etc).
 WhatIsBeneficiary = Le Bénéficiaire est la famille qui va consommer le bon en épicerie.
+RefIssuer = Réf. prescripteur
+WhatIsRefIssuer = Référence interne du bon chez le prescripteur.
 
 AmountLeft = Montant restant
 

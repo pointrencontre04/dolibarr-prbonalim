@@ -517,7 +517,11 @@ if (empty($reshook)) {
 					$beneficiary = new Societe($db);
 					$result = $beneficiary->fetch($b->beneficiary);
 					$beneficiary_name = ($result >=0 ? $beneficiary->name : '');
-					$label = $langs->trans('BonAlim').' '.$b->ref.' '.$beneficiary_name.' '.$langs->trans('BonAlimFrom').' '.dol_print_date($b->date_start, '%d/%m/%Y');
+					$label = $langs->trans('BonAlim');
+					if (!empty($b->ref_issuer)) {
+						$label .= ' '.$b->ref_issuer;
+					}
+					$label .= ' '.$langs->trans('BonAlimFrom').' '.dol_print_date($b->date_start, '%d/%m/%Y').' '.$beneficiary_name.' ('.$b->ref.')';
 
 					$result = $newinvoice->addline(
 						$label,
